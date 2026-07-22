@@ -22,7 +22,9 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert exit_code == 0
     assert "Chapter 1 inventory-state model" in output
     assert "authoritative-record comparison example" in output
-    assert "Synchronization and the simulation engine are not implemented" in output
+    assert "Inventory synchronization is not implemented" in output
+    assert "Queues and workers are not implemented" in output
+    assert "Chapter 6 introduces direct synchronization" in output
     assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
 
@@ -226,3 +228,37 @@ def test_package_module_supports_projections_command() -> None:
     assert "Status:     STALE" in completed.stdout
     assert "Status:     MATCH" in completed.stdout
     assert "Traceback" not in completed.stderr
+
+
+def test_timeline_command_teaches_deterministic_event_order(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["timeline"]) == 0
+    output = capsys.readouterr().out
+    assert "Starting simulated time: 0" in output
+    for label in (
+        "Inspect inventory",
+        "Refresh website projection",
+        "Refresh marketplace projection",
+        "Inspect inventory again",
+    ):
+        assert label in output
+    execution = output.index("Execution")
+    assert output.index("Time 2", execution) < output.index("Time 5", execution)
+    assert output.index("Refresh website projection", execution) < output.index(
+        "Refresh marketplace projection", execution
+    )
+    assert output.rindex("Time 8") > output.rindex("Time 5")
+    assert "Final simulated time: 8" in output
+    assert "No real waiting occurred" in output
+    assert "did not synchronize inventory" in output
+
+
+def test_package_module_supports_timeline_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "timeline"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Final simulated time: 8" in completed.stdout
+    assert "No real waiting occurred" in completed.stdout

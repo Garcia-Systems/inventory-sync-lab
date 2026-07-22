@@ -14,6 +14,7 @@ from inventory_sim.authority import (
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
+from inventory_sim.simulation import EventScheduler, VirtualClock
 
 
 def doctor() -> int:
@@ -36,13 +37,15 @@ def demo() -> int:
     print("Chapter 2 adds an authoritative-record comparison example.")
     print("Chapter 3 adds an inventory ledger that derives state from events.")
     print("Chapter 4 adds inventory projections and explicit manual refresh.")
-    print("Synchronization and the simulation engine are not implemented.")
-    print("Automatic synchronization and virtual time are not implemented.")
-    print("The deterministic simulation engine is not implemented.")
-    print("Chapter 5 introduces time and events.")
+    print("Chapter 5 adds a deterministic virtual timeline of generic actions.")
+    print("Inventory synchronization is not implemented.")
+    print("Queues and workers are not implemented.")
+    print("Retries and failures are not implemented.")
+    print("Chapter 6 introduces direct synchronization.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
-        "`inventory-sim ledger`, or `inventory-sim projections` to explore."
+        "`inventory-sim ledger`, `inventory-sim projections`, or "
+        "`inventory-sim timeline` to explore."
     )
     return 0
 
@@ -150,6 +153,34 @@ def projections() -> int:
     return 0
 
 
+def timeline() -> int:
+    """Demonstrate Chapter 5's deterministic simulated timeline."""
+    clock = VirtualClock()
+    scheduler = EventScheduler(clock)
+    events = (
+        (2, "Inspect inventory"),
+        (5, "Refresh website projection"),
+        (5, "Refresh marketplace projection"),
+        (8, "Inspect inventory again"),
+    )
+
+    print("Deterministic Timeline\n")
+    print(f"Starting simulated time: {clock.now}\n")
+    print("Scheduled events")
+    for position, (at, label) in enumerate(events, start=1):
+        print(f"{position}. Time {at} — {label}")
+        scheduler.schedule(at=at, label=label, action=lambda: None)
+
+    print("\nExecution")
+    for execution in scheduler.run():
+        print(f"\nTime {execution.time}\n  {execution.label}")
+    print(f"\nFinal simulated time: {clock.now}\n")
+    print("No real waiting occurred.")
+    print("Events at the same time ran in scheduling order.")
+    print("These descriptive actions did not synchronize inventory.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -175,6 +206,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "projections", help="manually refresh Chapter 4 inventory projections"
     )
+    subparsers.add_parser("timeline", help="run the Chapter 5 deterministic timeline")
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -208,6 +240,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return ledger()
     if args.command == "projections":
         return projections()
+    if args.command == "timeline":
+        return timeline()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
