@@ -12,6 +12,7 @@ from inventory_sim.authority import (
     compare_inventory,
 )
 from inventory_sim.inventory import InventoryState
+from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 
 
 def doctor() -> int:
@@ -33,8 +34,11 @@ def demo() -> int:
     print("The laboratory includes a basic Chapter 1 inventory-state model.")
     print("Chapter 2 adds an authoritative-record comparison example.")
     print("Synchronization and the simulation engine are not implemented.")
-    print("Chapter 3 will introduce the inventory ledger.")
-    print("Run `inventory-sim inventory` or `inventory-sim authority` to explore.")
+    print("Chapter 3 adds an inventory ledger that derives state from events.")
+    print(
+        "Run `inventory-sim inventory`, `inventory-sim authority`, or "
+        "`inventory-sim ledger` to explore."
+    )
     return 0
 
 
@@ -95,6 +99,20 @@ def authority(
     return 0
 
 
+def ledger() -> int:
+    """Display the canonical Chapter 3 ledger and its derived state."""
+    inventory_ledger = InventoryLedger([Receive(10), Reserve(3), Ship(2)])
+    print("Inventory Ledger\n")
+    for position, event in enumerate(inventory_ledger.events, start=1):
+        print(f"{position}. {event.event_type.value} {event.quantity}")
+    state = inventory_ledger.current_state()
+    print("\nCurrent Inventory\n")
+    print(f"On hand: {state.on_hand}")
+    print(f"Reserved: {state.reserved}")
+    print(f"Available: {state.available}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
     parser = argparse.ArgumentParser(
@@ -104,6 +122,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("doctor", help="verify the laboratory environment")
     subparsers.add_parser("demo", help="run the Chapter 0 smoke test")
+    subparsers.add_parser("ledger", help="replay the Chapter 3 inventory ledger")
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -133,6 +152,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return demo()
     if args.command == "inventory":
         return inventory(args.on_hand, args.reserved)
+    if args.command == "ledger":
+        return ledger()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
