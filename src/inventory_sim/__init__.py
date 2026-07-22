@@ -17,8 +17,9 @@ from inventory_sim.ledger import (
     Reserve,
     Ship,
 )
+from inventory_sim.projections import InventoryProjection
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "Adjustment",
@@ -29,6 +30,7 @@ __all__ = [
     "InventoryEvent",
     "InventoryEventType",
     "InventoryLedger",
+    "InventoryProjection",
     "Receive",
     "ReleaseReservation",
     "Reserve",
