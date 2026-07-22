@@ -22,9 +22,12 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert exit_code == 0
     assert "Chapter 1 inventory-state model" in output
     assert "authoritative-record comparison example" in output
-    assert "Inventory synchronization is not implemented" in output
-    assert "Queues and workers are not implemented" in output
-    assert "Chapter 6 introduces direct synchronization" in output
+    assert "Chapter 6 adds direct synchronization" in output
+    assert "Queues are not implemented" in output
+    assert "Workers are not implemented" in output
+    assert "Retries and failures are not implemented" in output
+    assert "Network latency is not modeled" in output
+    assert "Chapter 7 introduces queues" in output
     assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
 
@@ -262,3 +265,38 @@ def test_package_module_supports_timeline_command() -> None:
     assert completed.returncode == 0
     assert "Final simulated time: 8" in completed.stdout
     assert "No real waiting occurred" in completed.stdout
+
+
+def test_sync_direct_command_teaches_scheduled_copy(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["sync-direct"]) == 0
+    output = capsys.readouterr().out
+    assert "Direct Inventory Synchronization" in output
+    assert "Authoritative state" in output
+    assert "Available: 7" in output
+    assert "Initial website projection" in output
+    assert "Available:  10" in output
+    assert "Difference: +3" in output
+    assert "Time 4 — Inspect website" in output
+    assert "Status: STALE" in output
+    assert "Time 6 — Direct synchronization" in output
+    assert "Before available: 10" in output
+    assert "After available:  7" in output
+    assert "Time 8 — Inspect website" in output
+    assert "Difference: +0" in output
+    assert "Status: MATCH" in output
+    assert "Final simulated time: 8" in output
+    assert "No queue, worker" in output
+    assert "real waiting" in output
+    assert "no transport delay" in output
+
+
+def test_package_module_supports_sync_direct_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "sync-direct"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Time 6 — Direct synchronization" in completed.stdout
+    assert "Final simulated time: 8" in completed.stdout

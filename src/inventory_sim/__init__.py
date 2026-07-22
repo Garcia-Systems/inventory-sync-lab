@@ -19,12 +19,21 @@ from inventory_sim.ledger import (
 )
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
+from inventory_sim.synchronization import (
+    DirectSynchronizationExecution,
+    DirectSynchronizationResult,
+    ProjectionInspection,
+    run_direct_synchronization_scenario,
+    synchronize_directly,
+)
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 __all__ = [
     "Adjustment",
     "AuthoritativeInventoryRecord",
+    "DirectSynchronizationExecution",
+    "DirectSynchronizationResult",
     "InventoryComparison",
     "InventoryCopy",
     "InventoryState",
@@ -32,6 +41,7 @@ __all__ = [
     "InventoryEventType",
     "InventoryLedger",
     "InventoryProjection",
+    "ProjectionInspection",
     "EventExecution",
     "EventScheduler",
     "Receive",
@@ -41,4 +51,6 @@ __all__ = [
     "VirtualClock",
     "__version__",
     "compare_inventory",
+    "run_direct_synchronization_scenario",
+    "synchronize_directly",
 ]
