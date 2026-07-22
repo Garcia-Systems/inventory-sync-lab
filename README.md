@@ -14,18 +14,22 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 2: Authoritative source of truth — **complete**
 - Chapter 3: The inventory ledger — **complete**
 - Chapter 4: Inventory projections — **complete**
+- Chapter 5: Time and Events — **complete**
 
-Next: **Chapter 5 — Time and Events**
+Next: **Chapter 6 — Direct Synchronization**
 
 The laboratory now records inventory events and derives current inventory by
 replaying an immutable ledger. Projections can be compared with that authority
-and manually refreshed, but refreshes are not automatic. Virtual time and the
-deterministic simulation engine have not been implemented. Start with
+and manually refreshed, but refreshes are not automatic. Deterministic integer
+time and generic event scheduling now exist without real waiting. Automatic
+inventory synchronization, queues, workers, retries, and failures are not
+implemented. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
 [The Authoritative Source of Truth](book/02-authoritative-source-of-truth.md).
 Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
-[Inventory Projections](book/04-projections.md).
+[Inventory Projections](book/04-projections.md), followed by
+[Time and Events](book/05-time-and-events.md).
 
 ## Quick start
 
@@ -41,6 +45,7 @@ docker compose run --rm lab inventory-sim inventory \
 docker compose run --rm lab inventory-sim authority
 docker compose run --rm lab inventory-sim ledger
 docker compose run --rm lab inventory-sim projections
+docker compose run --rm lab inventory-sim timeline
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

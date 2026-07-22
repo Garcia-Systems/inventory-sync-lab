@@ -18,8 +18,9 @@ from inventory_sim.ledger import (
     Ship,
 )
 from inventory_sim.projections import InventoryProjection
+from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
     "Adjustment",
@@ -31,10 +32,13 @@ __all__ = [
     "InventoryEventType",
     "InventoryLedger",
     "InventoryProjection",
+    "EventExecution",
+    "EventScheduler",
     "Receive",
     "ReleaseReservation",
     "Reserve",
     "Ship",
+    "VirtualClock",
     "__version__",
     "compare_inventory",
 ]
