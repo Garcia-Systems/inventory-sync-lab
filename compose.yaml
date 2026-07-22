@@ -2,6 +2,7 @@ services:
   lab:
     build:
       context: .
+    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /workspace
     volumes:
       - .:/workspace

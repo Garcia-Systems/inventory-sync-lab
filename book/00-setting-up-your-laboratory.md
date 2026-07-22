@@ -216,6 +216,11 @@ volumes:
 
 If you edit `src/inventory_sim/cli.py` on the host, the next container command immediately reads that edit. You generally do not need to rebuild for source or test changes. Rebuild when `Dockerfile` or project dependencies change. Files created inside `/workspace` can appear in your host checkout because it is the same mounted directory.
 
+Development tools keep their disposable caches under the container's temporary
+directory rather than in the mounted checkout. Compose uses the host user and group
+IDs when they are provided, so generated outputs such as `coverage.xml` remain
+writable on Linux and in CI without running the container as root.
+
 ## 18. Common setup and CI problems
 
 ### `docker: command not found`

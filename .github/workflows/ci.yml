@@ -22,8 +22,20 @@ jobs:
           docker --version
           docker compose version
 
+      - name: Configure container user
+        run: |
+          echo "UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "GID=$(id -g)" >> "$GITHUB_ENV"
+
       - name: Build development image
         run: docker compose build
+
+      - name: Display ownership diagnostics
+        run: |
+          id
+          ls -ld .
+          docker compose run --rm lab id
+          docker compose run --rm lab sh -c 'printf "workspace: "; ls -ld /workspace; printf "tmp: "; ls -ld /tmp'
 
       - name: Run Ruff linting
         run: docker compose run --rm lab ruff check .

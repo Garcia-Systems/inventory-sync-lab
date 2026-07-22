@@ -26,10 +26,12 @@ packages = ["src/inventory_sim"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
+cache_dir = "/tmp/pytest-cache"
 testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
+data_file = "/tmp/inventory-sync-lab.coverage"
 source = ["src/inventory_sim"]
 
 [tool.coverage.report]
@@ -42,6 +44,7 @@ output = "coverage.xml"
 directory = "htmlcov"
 
 [tool.ruff]
+cache-dir = "/tmp/ruff-cache"
 target-version = "py313"
 line-length = 88
 
