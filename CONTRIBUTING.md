@@ -16,9 +16,18 @@ Use the documented Docker environment rather than relying on host Python tools:
 
 ```bash
 docker compose build
-docker compose run --rm lab pytest
 docker compose run --rm lab ruff check .
 docker compose run --rm lab ruff format --check .
+docker compose run --rm lab pytest \
+  --cov=inventory_sim \
+  --cov-branch \
+  --cov-report=term-missing
 ```
 
 Update the relevant prose alongside code, and verify every command a reader is asked to run.
+
+New functionality should normally include tests that check its behavior. Use
+coverage to notice untested paths, not as a percentage to optimize blindly. Review
+coverage changes in context, and justify any exclusion based on behavior that
+cannot usefully be measured—not merely because the exclusion raises the reported
+percentage.

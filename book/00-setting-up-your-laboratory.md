@@ -102,7 +102,73 @@ docker compose run --rm lab pytest
 
 A passing run ends with a count of passed tests. A failure includes the test name and the differing result so you can investigate it.
 
-## 11. Check linting and formatting
+## 11. Run tests with coverage locally
+
+Coverage records which application code the tests exercise. Run the same coverage
+command used by continuous integration:
+
+```bash
+docker compose run --rm lab pytest \
+  --cov=inventory_sim \
+  --cov-branch \
+  --cov-report=term-missing \
+  --cov-report=xml:coverage.xml
+```
+
+**Statement coverage** describes how many measured statements ran. **Branch
+coverage** also checks the different outcomes of decisions, such as both the true
+and false paths of an `if`. The `term-missing` report prints uncovered line numbers
+in the terminal. `coverage.xml` contains the same measurements in a structured
+format that reporting tools can read.
+
+The Compose source mount writes `coverage.xml` into the host checkout. It is a
+transient result, so Git ignores it: each test run should generate a fresh report
+instead of committing a machine-generated snapshot. To explore a browsable local
+report explicitly, replace or supplement the XML option with
+`--cov-report=html`; open `htmlcov/index.html` after the run.
+
+## 12. GitHub Actions
+
+GitHub Actions runs the same Docker-based checks whenever code is pushed to
+`main`, a pull request targets `main`, or an owner starts the workflow manually.
+The workflow builds the development image, then verifies formatting, linting,
+tests, coverage generation, and the health of both CLI commands. A failing command
+stops the job and clearly marks the check as failed.
+
+Running the checks in Docker matters: contributors and CI use the environment
+defined by this repository rather than relying on different host Python setups.
+
+## 13. What Codecov does
+
+Codecov does **not** run this project's tests. GitHub Actions runs pytest and
+creates `coverage.xml`; Codecov receives that report, stores coverage history, and
+presents coverage changes on commits and pull requests.
+
+A coverage percentage does not prove that software is correct. It only says which
+measured statements and branches were exercised. Useful tests check meaningful
+behavior rather than chasing a percentage.
+
+## 14. Required Codecov setup for the repository owner
+
+The committed configuration cannot create or reveal a repository token. An owner
+must complete these steps:
+
+1. Install or authorize the Codecov GitHub App for this repository.
+2. Add or activate the repository in Codecov.
+3. Copy the repository upload token from Codecov.
+4. Open the repository on GitHub.
+5. Go to **Settings → Secrets and variables → Actions**.
+6. Create a repository secret named `CODECOV_TOKEN`.
+7. Paste the upload token as the secret value.
+8. Push a commit or manually run the **Continuous Integration** workflow.
+9. Verify the upload in both the GitHub Actions log and Codecov.
+
+GitHub masks secret values in logs. Masking is a safety feature, not permission to
+share a token: never put the token in source code, documentation, command output,
+or a commit. Forked pull requests normally cannot access repository secrets, so
+their project checks run but their Codecov upload is intentionally skipped.
+
+## 15. Check linting and formatting
 
 Ruff performs two related jobs. Its linter finds selected correctness and consistency problems:
 
@@ -118,7 +184,7 @@ docker compose run --rm lab ruff format --check .
 
 Contributors should run both checks and pytest before proposing a change. To format files deliberately, run `docker compose run --rm lab ruff format .` and review the edits.
 
-## 12. Tour of the repository
+## 16. Tour of the repository
 
 ```text
 book/                 textbook chapters
@@ -127,9 +193,11 @@ experiments/          future reproducible experiment definitions
 results/              future reproducible outputs
 src/inventory_sim/    the installable Python package and CLI
 tests/                executable checks for current behavior
+.github/workflows/    GitHub Actions workflow definitions
 Dockerfile            recipe for the development image
 compose.yaml          development service and source mount
 pyproject.toml        package metadata, tools, and CLI entry point
+codecov.yml            Codecov status and comment policy
 README.md             project overview and quick start
 CONTRIBUTING.md        contribution principles and checks
 LICENSE                open-source license
@@ -137,7 +205,7 @@ LICENSE                open-source license
 
 The empty directories contain `.gitkeep` files because Git does not otherwise record empty directories. They reserve obvious homes for material only when later chapters introduce it.
 
-## 13. How source mounting works
+## 17. How source mounting works
 
 The image contains Python and installed tools. When Compose starts `lab`, this entry in `compose.yaml` maps the current host directory to `/workspace`:
 
@@ -148,7 +216,7 @@ volumes:
 
 If you edit `src/inventory_sim/cli.py` on the host, the next container command immediately reads that edit. You generally do not need to rebuild for source or test changes. Rebuild when `Dockerfile` or project dependencies change. Files created inside `/workspace` can appear in your host checkout because it is the same mounted directory.
 
-## 14. Common setup problems
+## 18. Common setup and CI problems
 
 ### `docker: command not found`
 
@@ -178,20 +246,65 @@ Confirm you used `docker compose run --rm lab ...`, not an unrelated container, 
 
 The image uses a non-root user with a common user ID. Host configurations vary, particularly on Linux. Remove an unwanted generated file from the host, or adjust the development user mapping locally; do not run broad permission-changing commands without understanding their effect.
 
+### `coverage.xml` was not created
+
+Run the complete coverage command from the repository root and include
+`--cov-report=xml:coverage.xml`. Check that pytest succeeded; a failed test command
+may not produce a usable report.
+
+### The Codecov step was skipped or the token is missing
+
+The upload runs only when the `CODECOV_TOKEN` repository secret is nonempty. An
+owner should complete the manual setup above. A forked pull request cannot normally
+receive this secret, so a skipped upload there is expected and does not skip the
+project checks.
+
+### Codecov reports “no coverage reports found”
+
+Check that the pytest step created a nonempty `coverage.xml` in the repository root
+and that the workflow still uploads `./coverage.xml`. The workflow has a separate
+file check to make this problem visible before upload.
+
+### CI passes but no Codecov status appears
+
+Confirm that an authenticated upload actually ran and succeeded. Codecov may have
+nothing to display before the first successful upload; also verify that the
+repository is active in Codecov and that the Codecov GitHub App is authorized for
+it.
+
+### The Codecov GitHub App has not been authorized
+
+Ask a repository owner to install or authorize the app for this repository, then
+rerun CI. A token upload alone does not guarantee that Codecov can publish GitHub
+checks and pull-request information.
+
+### Local tests pass but Docker-based CI fails
+
+Rebuild and run the documented `docker compose` checks locally. Host Python can
+have different versions or dependencies; the container result matches the
+repository's CI environment more closely. Compare the Docker and Compose versions
+printed near the start of the Actions log as well.
+
 For diagnosis, rerun `inventory-sim doctor` and retain its complete output along with `docker version` and `docker compose version` when asking for help.
 
-## 15. Questions for the reader
+## 19. Questions for the reader
 
 1. Which tools remain installed on your host, and which are supplied by the image?
 2. Why does `docker compose run --rm` suit short development checks?
 3. When must you rebuild the image, and when is a source mount enough?
 4. What does the `doctor` output prove? What intentionally remains outside its checks?
 5. Why might implementing later concepts before their chapters make this textbook harder to learn from?
+6. Why can high coverage coexist with incorrect behavior?
+7. Which system runs tests, and which system records their coverage history?
 
-## 16. Chapter summary
+## 20. Chapter summary
 
-You installed or verified the required host tools, cloned the repository, built a consistent Python environment, and ran its two foundational commands. You also learned how pytest and Ruff check the project, where its main files live, and how Compose exposes host edits to the container. The laboratory is ready, but it contains no inventory behavior yet.
+You installed or verified the required host tools, cloned the repository, built a
+consistent Python environment, and ran its foundational commands. You also learned
+how pytest, coverage, Ruff, GitHub Actions, and Codecov support the project, where
+its main files live, and how Compose exposes host edits to the container. The
+laboratory is ready, but it contains no inventory behavior yet.
 
-## 17. What comes next in Chapter 1
+## 21. What comes next in Chapter 1
 
 Chapter 1 will introduce the first project concept and its vocabulary before any corresponding implementation is added. Stop here for now: Chapter 0's purpose is only to establish a trustworthy, repeatable workspace.

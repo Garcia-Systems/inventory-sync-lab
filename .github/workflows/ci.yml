@@ -1,0 +1,62 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Display Docker versions
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Build development image
+        run: docker compose build
+
+      - name: Run Ruff linting
+        run: docker compose run --rm lab ruff check .
+
+      - name: Check Ruff formatting
+        run: docker compose run --rm lab ruff format --check .
+
+      - name: Run tests with branch coverage
+        run: |
+          docker compose run --rm lab pytest \
+            --cov=inventory_sim \
+            --cov-branch \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml
+
+      - name: Run doctor smoke check
+        run: docker compose run --rm lab inventory-sim doctor
+
+      - name: Run demo smoke check
+        run: docker compose run --rm lab inventory-sim demo
+
+      - name: Verify coverage report
+        run: test -s coverage.xml
+
+      - name: Upload coverage to Codecov
+        if: env.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ env.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: unittests
+          name: inventory-sync-lab
+          fail_ci_if_error: true
+          verbose: true
