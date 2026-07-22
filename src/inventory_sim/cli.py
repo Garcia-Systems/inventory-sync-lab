@@ -2,9 +2,11 @@
 
 import argparse
 import platform
+import sys
 from collections.abc import Sequence
 
 from inventory_sim import __version__
+from inventory_sim.inventory import InventoryState
 
 
 def doctor() -> int:
@@ -23,8 +25,25 @@ def demo() -> int:
     """Run the Chapter 0 demonstration without simulating inventory."""
     print("Welcome to the Inventory Synchronization Laboratory!")
     print("The development environment and command-line interface are functioning.")
-    print("The inventory simulator has not been implemented yet.")
-    print("Continue to Chapter 1 when it becomes available.")
+    print("The laboratory now includes a basic Chapter 1 inventory-state example.")
+    print("Synchronization and the full simulator have not been implemented yet.")
+    print("Run `inventory-sim inventory` to explore the Chapter 1 model.")
+    return 0
+
+
+def inventory(on_hand: int, reserved: int) -> int:
+    """Display a validated Chapter 1 inventory state."""
+    try:
+        state = InventoryState(on_hand=on_hand, reserved=reserved)
+    except ValueError as error:
+        print(f"Error: invalid inventory state: {error}", file=sys.stderr)
+        return 2
+
+    print("Inventory State")
+    print()
+    print(f"On hand:   {state.on_hand}")
+    print(f"Reserved:  {state.reserved}")
+    print(f"Available: {state.available}")
     return 0
 
 
@@ -37,6 +56,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("doctor", help="verify the laboratory environment")
     subparsers.add_parser("demo", help="run the Chapter 0 smoke test")
+    inventory_parser = subparsers.add_parser(
+        "inventory", help="display a Chapter 1 inventory state"
+    )
+    inventory_parser.add_argument("--on-hand", type=int, default=10)
+    inventory_parser.add_argument("--reserved", type=int, default=3)
     return parser
 
 
@@ -45,4 +69,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "doctor":
         return doctor()
-    return demo()
+    if args.command == "demo":
+        return demo()
+    return inventory(args.on_hand, args.reserved)

@@ -9,7 +9,11 @@ This repository is **education-first**: the written guide introduces each idea b
 
 ## Current status
 
-Chapter 0 provides only the development environment and a harmless CLI smoke test. **The inventory simulator has not been implemented yet.** Start with [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md).
+Chapter 0's development laboratory is complete. Chapter 1 introduces the first,
+small inventory-state model. Synchronization and the deterministic simulation
+engine have **not** been implemented. Start with
+[Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), then read
+[What Is Inventory?](book/01-what-is-inventory.md).
 
 ## Quick start
 
@@ -19,6 +23,9 @@ Docker is the default development environment. From the repository root:
 docker compose build
 docker compose run --rm lab inventory-sim doctor
 docker compose run --rm lab inventory-sim demo
+docker compose run --rm lab inventory-sim inventory \
+  --on-hand 10 \
+  --reserved 3
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
@@ -40,7 +47,7 @@ until the first successful CI upload.
 - `book/` contains the chapters that drive development.
 - `src/inventory_sim/` contains executable Python introduced by the book.
 - `tests/` contains readable checks for the examples and CLI.
-- `diagrams/` will hold explanatory diagrams.
+- `diagrams/` holds explanatory diagrams.
 - `experiments/` and `results/` are reserved for later, reproducible work.
 
 ## Education and contributions

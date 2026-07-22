@@ -57,6 +57,9 @@ jobs:
       - name: Run demo smoke check
         run: docker compose run --rm lab inventory-sim demo
 
+      - name: Run Chapter 1 inventory smoke check
+        run: docker compose run --rm lab inventory-sim inventory
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
