@@ -14,6 +14,7 @@ dependencies = []
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3,<9",
+    "pytest-cov>=6,<7",
     "ruff>=0.11,<0.12",
 ]
 
@@ -25,9 +26,25 @@ packages = ["src/inventory_sim"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
+cache_dir = "/tmp/pytest-cache"
 testpaths = ["tests"]
 
+[tool.coverage.run]
+branch = true
+data_file = "/tmp/inventory-sync-lab.coverage"
+source = ["src/inventory_sim"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.html]
+directory = "htmlcov"
+
 [tool.ruff]
+cache-dir = "/tmp/ruff-cache"
 target-version = "py313"
 line-length = 88
 

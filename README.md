@@ -1,5 +1,8 @@
 # Inventory Synchronization Laboratory
 
+![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An executable engineering textbook for learning deterministic inventory synchronization.
 
 This repository is **education-first**: the written guide introduces each idea before code implements it. Explanations, small Python programs, tests, and eventually reproducible experiments will work together so readers can inspect every claim.
@@ -17,9 +20,20 @@ docker compose build
 docker compose run --rm lab inventory-sim doctor
 docker compose run --rm lab inventory-sim demo
 docker compose run --rm lab pytest
+docker compose run --rm lab pytest \
+  --cov=inventory_sim \
+  --cov-branch \
+  --cov-report=term-missing \
+  --cov-report=xml:coverage.xml
 docker compose run --rm lab ruff check .
 docker compose run --rm lab ruff format --check .
 ```
+
+pytest measures coverage of the application package; the report shows what the
+current tests exercised without claiming that the test suite is complete. CI runs
+these checks through Docker on pushes and pull requests. Codecov requires the
+repository owner to add one `CODECOV_TOKEN` Actions secret and may show no result
+until the first successful CI upload.
 
 ## Repository map
 
