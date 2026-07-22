@@ -13,6 +13,7 @@ from inventory_sim.authority import (
 )
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
+from inventory_sim.projections import InventoryProjection
 
 
 def doctor() -> int:
@@ -33,11 +34,15 @@ def demo() -> int:
     print("The development environment and command-line interface are functioning.")
     print("The laboratory includes a basic Chapter 1 inventory-state model.")
     print("Chapter 2 adds an authoritative-record comparison example.")
-    print("Synchronization and the simulation engine are not implemented.")
     print("Chapter 3 adds an inventory ledger that derives state from events.")
+    print("Chapter 4 adds inventory projections and explicit manual refresh.")
+    print("Synchronization and the simulation engine are not implemented.")
+    print("Automatic synchronization and virtual time are not implemented.")
+    print("The deterministic simulation engine is not implemented.")
+    print("Chapter 5 introduces time and events.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
-        "`inventory-sim ledger` to explore."
+        "`inventory-sim ledger`, or `inventory-sim projections` to explore."
     )
     return 0
 
@@ -113,6 +118,50 @@ def ledger() -> int:
     return 0
 
 
+def projections() -> int:
+    """Demonstrate Chapter 4 projections and an explicit manual refresh."""
+    inventory_ledger = InventoryLedger([Receive(10), Reserve(3)])
+    authoritative_state = inventory_ledger.current_state()
+    system_projections = (
+        InventoryProjection("warehouse", authoritative_state),
+        InventoryProjection("website", authoritative_state),
+        InventoryProjection("marketplace", InventoryState(10, 0)),
+    )
+
+    print("Inventory Projections\n")
+    print("Authoritative ledger")
+    for position, recorded in enumerate(inventory_ledger.events, start=1):
+        print(f"{position}. {recorded.event_type.value} {recorded.quantity}")
+    print("\nAuthoritative state")
+    print(f"On hand:   {authoritative_state.on_hand}")
+    print(f"Reserved:  {authoritative_state.reserved}")
+    print(f"Available: {authoritative_state.available}")
+    print("\nProjections before manual refresh")
+    for projection in system_projections:
+        _print_projection(projection, authoritative_state)
+
+    marketplace = system_projections[-1]
+    refreshed = marketplace.refresh_from(authoritative_state)
+    print("\nManual refresh")
+    print("marketplace copied the authoritative state by explicit manual operation.")
+    print("No automatic synchronization occurred.")
+    print("\nProjection after manual refresh")
+    _print_projection(refreshed, authoritative_state)
+    return 0
+
+
+def _print_projection(
+    projection: InventoryProjection, authoritative_state: InventoryState
+) -> None:
+    comparison = projection.compare_to(authoritative_state)
+    print(f"\n{projection.system}")
+    print(f"  On hand:    {projection.state.on_hand}")
+    print(f"  Reserved:   {projection.state.reserved}")
+    print(f"  Available:  {projection.state.available}")
+    print(f"  Difference: {comparison.available_difference:+d}")
+    print(f"  Status:     {'MATCH' if comparison.matches else 'STALE'}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line argument parser."""
     parser = argparse.ArgumentParser(
@@ -123,6 +172,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("doctor", help="verify the laboratory environment")
     subparsers.add_parser("demo", help="run the Chapter 0 smoke test")
     subparsers.add_parser("ledger", help="replay the Chapter 3 inventory ledger")
+    subparsers.add_parser(
+        "projections", help="manually refresh Chapter 4 inventory projections"
+    )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -154,6 +206,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return inventory(args.on_hand, args.reserved)
     if args.command == "ledger":
         return ledger()
+    if args.command == "projections":
+        return projections()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

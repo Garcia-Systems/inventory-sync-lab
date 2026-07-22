@@ -63,6 +63,12 @@ jobs:
       - name: Run Chapter 2 authority smoke check
         run: docker compose run --rm lab inventory-sim authority
 
+      - name: Run Chapter 3 ledger smoke check
+        run: docker compose run --rm lab inventory-sim ledger
+
+      - name: Run Chapter 4 projections smoke check
+        run: docker compose run --rm lab inventory-sim projections
+
       - name: Verify coverage report
         run: test -s coverage.xml
 

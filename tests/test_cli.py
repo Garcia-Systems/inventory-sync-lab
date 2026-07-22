@@ -192,3 +192,37 @@ def test_package_module_supports_ledger_command() -> None:
     assert completed.returncode == 0
     assert "1. Receive 10" in completed.stdout
     assert "Available: 7" in completed.stdout
+
+
+def test_projections_command_teaches_manual_refresh(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["projections"]) == 0
+    output = capsys.readouterr().out
+
+    assert "Authoritative ledger" in output
+    assert "Authoritative state" in output
+    assert "On hand:   10" in output
+    assert "Reserved:  3" in output
+    assert "warehouse\n" in output
+    assert "website\n" in output
+    assert "marketplace\n" in output
+    assert output.count("Status:     MATCH") == 3
+    assert "Difference: +3" in output
+    assert "Status:     STALE" in output
+    assert "Manual refresh" in output
+    assert "No automatic synchronization occurred" in output
+    assert "Projection after manual refresh" in output
+    assert "Difference: +0" in output
+
+
+def test_package_module_supports_projections_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "projections"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "marketplace" in completed.stdout
+    assert "Status:     STALE" in completed.stdout
+    assert "Status:     MATCH" in completed.stdout
+    assert "Traceback" not in completed.stderr
