@@ -14,6 +14,7 @@ from inventory_sim.authority import (
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
+from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
 from inventory_sim.synchronization import run_direct_synchronization_scenario
 
@@ -40,14 +41,16 @@ def demo() -> int:
     print("Chapter 4 adds inventory projections and explicit manual refresh.")
     print("Chapter 5 adds a deterministic virtual timeline of generic actions.")
     print("Chapter 6 adds direct synchronization at a deterministic simulated time.")
-    print("Queues are not implemented. Workers are not implemented.")
-    print("Retries and failures are not implemented.")
-    print("Network latency is not modeled.")
-    print("Chapter 7 introduces queues.")
+    print("Chapter 7 adds queued synchronization and FIFO request processing.")
+    print("One deterministic worker processes one request per scheduled action.")
+    print("Failures, retries, and multiple workers are not implemented.")
+    print("Variable latency is not modeled.")
+    print("Chapter 8 introduces worker capacity and service time.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
-        "`inventory-sim timeline`, or `inventory-sim sync-direct` to explore."
+        "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
+        "`inventory-sim sync-queue` to explore."
     )
     return 0
 
@@ -221,6 +224,66 @@ def sync_direct() -> int:
     return 0
 
 
+def sync_queue() -> int:
+    """Run the canonical Chapter 7 queued synchronization scenario."""
+    result = run_queue_synchronization_scenario()
+    authority = result.authoritative_state
+    print("Queued Inventory Synchronization\n")
+    print("Authoritative state")
+    print(f"On hand:   {authority.on_hand}")
+    print(f"Reserved:  {authority.reserved}")
+    print(f"Available: {authority.available}\n")
+    print("Initial projections")
+    for projection, difference in zip(
+        result.initial_projections,
+        result.initial_available_differences,
+        strict=True,
+    ):
+        print(f"\n{projection.system}")
+        print(f"  Available:  {projection.state.available}")
+        print(f"  Difference: {difference:+d}")
+        print("  Status:     STALE")
+
+    print("\nTimeline")
+    for execution in result.enqueues:
+        print(f"\nTime {execution.time} — Enqueue {execution.system} synchronization")
+        print(f"  Queue depth: {execution.queue_depth}")
+
+    by_time = {inspection.time: inspection for inspection in result.inspections}
+
+    def print_inspection(time: int, label: str) -> None:
+        inspection = by_time[time]
+        print(f"\nTime {time} — {label}")
+        print(f"  Queue depth: {inspection.queue_depth}")
+        for projection in inspection.projections:
+            status = "MATCH" if projection.matches else "STALE"
+            print(
+                f"  {projection.system}: {status} "
+                f"({projection.available_difference:+d})"
+            )
+
+    print_inspection(4, "Inspect system")
+    for execution, inspection_time in zip(
+        result.worker_executions, (6, 8), strict=True
+    ):
+        inspection = by_time[inspection_time]
+        print(f"\nTime {execution.time} — Worker processes next request")
+        print(f"  Processed: {execution.system}")
+        print(f"  Queue depth: {execution.queue_depth_after}")
+        for projection in inspection.projections:
+            status = "MATCH" if projection.matches else "STALE"
+            print(f"  {projection.system}: {status}")
+    print_inspection(8, "Final inspection")
+    print(f"\nFinal simulated time: {result.final_time}\n")
+    print("Enqueuing did not update either projection.")
+    print("A single worker processed one request at a time in FIFO order.")
+    print(
+        "No retries, failures, network delay, parallel workers, or real waiting "
+        "were used."
+    )
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -249,6 +312,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("timeline", help="run the Chapter 5 deterministic timeline")
     subparsers.add_parser(
         "sync-direct", help="run the Chapter 6 direct synchronization scenario"
+    )
+    subparsers.add_parser(
+        "sync-queue", help="run the Chapter 7 queued synchronization scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -287,6 +353,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return timeline()
     if args.command == "sync-direct":
         return sync_direct()
+    if args.command == "sync-queue":
+        return sync_queue()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

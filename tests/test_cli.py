@@ -23,11 +23,12 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert "Chapter 1 inventory-state model" in output
     assert "authoritative-record comparison example" in output
     assert "Chapter 6 adds direct synchronization" in output
-    assert "Queues are not implemented" in output
-    assert "Workers are not implemented" in output
-    assert "Retries and failures are not implemented" in output
-    assert "Network latency is not modeled" in output
-    assert "Chapter 7 introduces queues" in output
+    assert "Chapter 7 adds queued synchronization" in output
+    assert "FIFO request processing" in output
+    assert "One deterministic worker" in output
+    assert "Failures, retries, and multiple workers are not implemented" in output
+    assert "Variable latency is not modeled" in output
+    assert "Chapter 8 introduces worker capacity" in output
     assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
 
@@ -299,4 +300,39 @@ def test_package_module_supports_sync_direct_command() -> None:
     )
     assert completed.returncode == 0
     assert "Time 6 — Direct synchronization" in completed.stdout
+    assert "Final simulated time: 8" in completed.stdout
+
+
+def test_sync_queue_command_teaches_fifo_waiting(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["sync-queue"]) == 0
+    output = capsys.readouterr().out
+    assert "Queued Inventory Synchronization" in output
+    assert "Available: 7" in output
+    assert "website\n  Available:  10\n  Difference: +3" in output
+    assert "marketplace\n  Available:  9\n  Difference: +2" in output
+    assert "Time 2 — Enqueue website" in output
+    assert "Time 3 — Enqueue marketplace" in output
+    assert "Time 4 — Inspect system\n  Queue depth: 2" in output
+    assert "Time 5 — Worker processes next request\n  Processed: website" in output
+    assert "Queue depth: 1" in output
+    assert "Time 7 — Worker processes next request\n  Processed: marketplace" in output
+    assert "Time 8 — Final inspection\n  Queue depth: 0" in output
+    assert "website: MATCH" in output
+    assert "marketplace: MATCH" in output
+    assert "Enqueuing did not update either projection" in output
+    assert "one request at a time in FIFO order" in output
+    assert "No retries, failures" in output
+    assert "parallel workers, or real waiting" in output
+
+
+def test_package_module_supports_sync_queue_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "sync-queue"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Processed: website" in completed.stdout
+    assert "Processed: marketplace" in completed.stdout
     assert "Final simulated time: 8" in completed.stdout

@@ -18,6 +18,17 @@ from inventory_sim.ledger import (
     Ship,
 )
 from inventory_sim.projections import InventoryProjection
+from inventory_sim.queues import (
+    ProjectionRegistry,
+    QueueEnqueueExecution,
+    QueueScenarioInspection,
+    QueueSynchronizationResult,
+    SynchronizationQueue,
+    SynchronizationRequest,
+    SynchronizationWorker,
+    WorkerExecution,
+    run_queue_synchronization_scenario,
+)
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
 from inventory_sim.synchronization import (
     DirectSynchronizationExecution,
@@ -42,15 +53,24 @@ __all__ = [
     "InventoryLedger",
     "InventoryProjection",
     "ProjectionInspection",
+    "ProjectionRegistry",
+    "QueueEnqueueExecution",
+    "QueueScenarioInspection",
+    "QueueSynchronizationResult",
     "EventExecution",
     "EventScheduler",
     "Receive",
     "ReleaseReservation",
     "Reserve",
     "Ship",
+    "SynchronizationQueue",
+    "SynchronizationRequest",
+    "SynchronizationWorker",
     "VirtualClock",
+    "WorkerExecution",
     "__version__",
     "compare_inventory",
     "run_direct_synchronization_scenario",
+    "run_queue_synchronization_scenario",
     "synchronize_directly",
 ]
