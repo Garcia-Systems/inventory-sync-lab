@@ -15,6 +15,7 @@ from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.simulation import EventScheduler, VirtualClock
+from inventory_sim.synchronization import run_direct_synchronization_scenario
 
 
 def doctor() -> int:
@@ -38,14 +39,15 @@ def demo() -> int:
     print("Chapter 3 adds an inventory ledger that derives state from events.")
     print("Chapter 4 adds inventory projections and explicit manual refresh.")
     print("Chapter 5 adds a deterministic virtual timeline of generic actions.")
-    print("Inventory synchronization is not implemented.")
-    print("Queues and workers are not implemented.")
+    print("Chapter 6 adds direct synchronization at a deterministic simulated time.")
+    print("Queues are not implemented. Workers are not implemented.")
     print("Retries and failures are not implemented.")
-    print("Chapter 6 introduces direct synchronization.")
+    print("Network latency is not modeled.")
+    print("Chapter 7 introduces queues.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
-        "`inventory-sim timeline` to explore."
+        "`inventory-sim timeline`, or `inventory-sim sync-direct` to explore."
     )
     return 0
 
@@ -181,6 +183,44 @@ def timeline() -> int:
     return 0
 
 
+def sync_direct() -> int:
+    """Run the canonical Chapter 6 direct synchronization scenario."""
+    result = run_direct_synchronization_scenario()
+    authority = result.authoritative_state
+    initial = result.initial_projection
+    print("Direct Inventory Synchronization\n")
+    print("Authoritative state")
+    print(f"On hand:   {authority.on_hand}")
+    print(f"Reserved:  {authority.reserved}")
+    print(f"Available: {authority.available}\n")
+    print("Initial website projection")
+    print(f"On hand:    {initial.state.on_hand}")
+    print(f"Reserved:   {initial.state.reserved}")
+    print(f"Available:  {initial.state.available}")
+    print(f"Difference: {result.initial_available_difference:+d}")
+    print("Status:     STALE\n")
+    print("Timeline")
+    before, after = result.inspections
+    print(f"\nTime {before.time} — Inspect website")
+    print(f"  Available: {before.state.available}")
+    print(f"  Difference: {before.available_difference:+d}")
+    print(f"  Status: {'MATCH' if before.matches else 'STALE'}")
+    synchronization = result.synchronization
+    print(f"\nTime {synchronization.time} — Direct synchronization")
+    print("  Website copied the authoritative state.")
+    print(f"  Before available: {synchronization.before.state.available}")
+    print(f"  After available:  {synchronization.after.state.available}")
+    print(f"\nTime {after.time} — Inspect website")
+    print(f"  Available: {after.state.available}")
+    print(f"  Difference: {after.available_difference:+d}")
+    print(f"  Status: {'MATCH' if after.matches else 'STALE'}")
+    print(f"\nFinal simulated time: {result.final_time}\n")
+    print("The projection was updated directly.")
+    print("No queue, worker, retry, network delay, or real waiting was used.")
+    print("The model includes no transport delay.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -207,6 +247,9 @@ def build_parser() -> argparse.ArgumentParser:
         "projections", help="manually refresh Chapter 4 inventory projections"
     )
     subparsers.add_parser("timeline", help="run the Chapter 5 deterministic timeline")
+    subparsers.add_parser(
+        "sync-direct", help="run the Chapter 6 direct synchronization scenario"
+    )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -242,6 +285,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return projections()
     if args.command == "timeline":
         return timeline()
+    if args.command == "sync-direct":
+        return sync_direct()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
