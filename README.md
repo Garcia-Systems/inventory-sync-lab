@@ -12,14 +12,17 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 0: Laboratory setup — **complete**
 - Chapter 1: What is inventory? — **complete**
 - Chapter 2: Authoritative source of truth — **complete**
-- Chapter 3: Inventory ledger — **next**
+- Chapter 3: The inventory ledger — **complete**
 
-The laboratory can now compare copied inventory states with one explicitly
-authoritative record. It does not automatically synchronize those copies, and no
-ledger or simulation engine exists yet. Start with
+Next: **Chapter 4 — Inventory Projections**
+
+The laboratory now records inventory events and derives current inventory by
+replaying an immutable ledger. It does not include projections or a simulation
+engine. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
 [The Authoritative Source of Truth](book/02-authoritative-source-of-truth.md).
+Then read [The Inventory Ledger](book/03-the-inventory-ledger.md).
 
 ## Quick start
 
@@ -33,6 +36,7 @@ docker compose run --rm lab inventory-sim inventory \
   --on-hand 10 \
   --reserved 3
 docker compose run --rm lab inventory-sim authority
+docker compose run --rm lab inventory-sim ledger
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

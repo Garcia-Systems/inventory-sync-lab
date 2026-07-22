@@ -23,7 +23,7 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert "Chapter 1 inventory-state model" in output
     assert "authoritative-record comparison example" in output
     assert "Synchronization and the simulation engine are not implemented" in output
-    assert "Chapter 3 will introduce the inventory ledger" in output
+    assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
 
 
@@ -166,3 +166,29 @@ def test_package_module_supports_authority_command() -> None:
     assert completed.returncode == 0
     assert "inventory-authority" in completed.stdout
     assert "Difference: +3" in completed.stdout
+
+
+def test_ledger_command_displays_events_and_derived_inventory(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["ledger"]) == 0
+    assert capsys.readouterr().out == (
+        "Inventory Ledger\n\n"
+        "1. Receive 10\n"
+        "2. Reserve 3\n"
+        "3. Ship 2\n\n"
+        "Current Inventory\n\n"
+        "On hand: 8\n"
+        "Reserved: 1\n"
+        "Available: 7\n"
+    )
+
+
+def test_package_module_supports_ledger_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "ledger"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "1. Receive 10" in completed.stdout
+    assert "Available: 7" in completed.stdout
