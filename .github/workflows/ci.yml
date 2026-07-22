@@ -75,6 +75,9 @@ jobs:
       - name: Run Chapter 6 direct synchronization smoke check
         run: docker compose run --rm lab inventory-sim sync-direct
 
+      - name: Run Chapter 7 queued synchronization smoke check
+        run: docker compose run --rm lab inventory-sim sync-queue
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
