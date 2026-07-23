@@ -29,6 +29,7 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 17: Retry Policies — **complete**
 - Chapter 18: Duplicate Delivery — **complete**
 - Chapter 19: Idempotent Synchronization — **complete**
+- Chapter 20: Out-of-Order Delivery — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -44,7 +45,9 @@ Chapter 10 demonstrates that authority can change while an earlier captured
 snapshot waits, leaving a successful projection update already obsolete. Chapter
 17 adds one deterministic delivery failure and retry, Chapter 18 exposes duplicate
 delivery, and Chapter 19 makes its effects idempotent; real threads, random
-failures, and random service times are not implemented. This is not production
+failures, and random service times are not implemented. Chapter 20 shows that
+distinct requests processed exactly once can still produce an incorrect result
+when delivered out of order. This is not production
 synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
@@ -66,6 +69,7 @@ Continue with [Multiple Projections](book/15-multiple-projections.md), followed 
 Policies](book/17-retry-policies.md).
 Continue with [Duplicate Delivery](book/18-duplicate-delivery.md).
 Then read [Idempotent Synchronization](book/19-idempotent-synchronization.md).
+Continue with [Out-of-Order Delivery](book/20-out-of-order-delivery.md).
 
 ## Quick start
 
@@ -96,6 +100,7 @@ docker compose run --rm lab inventory-sim fanout
 docker compose run --rm lab inventory-sim retries
 docker compose run --rm lab inventory-sim duplicate-delivery
 docker compose run --rm lab inventory-sim idempotency
+docker compose run --rm lab inventory-sim out-of-order
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
