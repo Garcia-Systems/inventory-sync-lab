@@ -10,10 +10,13 @@ from inventory_sim.capacity import (
 from inventory_sim.idempotency import AppliedRequestRegistry
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve
-from inventory_sim.multiple_projections import RevisionedProjection
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import ProjectionRegistry, SynchronizationRequest
-from inventory_sim.revisions import InventoryRevision, RevisionedInventoryState
+from inventory_sim.revisions import (
+    InventoryRevision,
+    RevisionedInventoryState,
+    RevisionedProjection,
+)
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
 from inventory_sim.worker_pool import WorkerPool
 

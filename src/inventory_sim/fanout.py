@@ -14,6 +14,7 @@ from inventory_sim.queues import ProjectionRegistry, SynchronizationRequest
 from inventory_sim.revisions import (
     InventoryRevision,
     RevisionedInventoryState,
+    RevisionedProjection,
     observe_ledger_revisions,
 )
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
@@ -38,14 +39,6 @@ class FanOutGenerator:
             SynchronizationRequest(projection.system, authority.state)
             for projection in self._projections.projections
         )
-
-
-@dataclass(frozen=True)
-class RevisionedProjection:
-    """A projection paired with the authority revision it has applied."""
-
-    projection: InventoryProjection
-    revision: InventoryRevision
 
 
 @dataclass(frozen=True)

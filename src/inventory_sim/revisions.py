@@ -35,6 +35,14 @@ class RevisionedInventoryState:
 
 
 @dataclass(frozen=True)
+class RevisionedProjection:
+    """An immutable projection paired with the authority revision it applied."""
+
+    projection: InventoryProjection
+    revision: InventoryRevision
+
+
+@dataclass(frozen=True)
 class RevisionScenarioResult:
     """The inspectable result of the canonical ordering demonstration."""
 

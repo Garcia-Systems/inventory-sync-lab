@@ -13,6 +13,7 @@ from inventory_sim.queues import ProjectionRegistry, SynchronizationRequest
 from inventory_sim.revisions import (
     InventoryRevision,
     RevisionedInventoryState,
+    RevisionedProjection,
     observe_ledger_revisions,
 )
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
@@ -21,14 +22,6 @@ from inventory_sim.stale_rejection import (
     inspect_synchronization_policy,
 )
 from inventory_sim.worker_pool import WorkerPool
-
-
-@dataclass(frozen=True)
-class RevisionedProjection:
-    """An immutable projection together with the authority revision it copied."""
-
-    projection: InventoryProjection
-    revision: InventoryRevision
 
 
 @dataclass(frozen=True)
