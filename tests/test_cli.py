@@ -25,12 +25,51 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert "Chapter 6 adds direct synchronization" in output
     assert "Chapter 7 adds queued synchronization" in output
     assert "FIFO request processing" in output
-    assert "One deterministic worker" in output
-    assert "Failures, retries, and multiple workers are not implemented" in output
-    assert "Variable latency is not modeled" in output
-    assert "Chapter 8 introduces worker capacity" in output
+    assert "Chapter 8 adds fixed processing time" in output
+    assert "One worker is BUSY" in output
+    assert "Multiple workers, failures, and retries are not implemented" in output
+    assert "Random latency is not implemented" in output
+    assert "Chapter 9 introduces multiple workers" in output
     assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
+
+
+def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["worker-capacity"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Workers and Capacity",
+        "Available: 7",
+        "Service time: 3 ticks",
+        "Capacity: one request at a time",
+        "Time 1 — website",
+        "Time 2 — marketplace",
+        "Time 3 — storefront",
+        "completion scheduled for time 4",
+        "completion scheduled for time 7",
+        "completion scheduled for time 10",
+        "Wait: 0",
+        "Wait: 2",
+        "Wait: 4",
+        "Queue depth: 2",
+        "Final worker state: IDLE",
+        "Final queue depth: 0",
+        "Final simulated time: 11",
+        "Requests arrived faster",
+        "No real waiting",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_worker_capacity_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "worker-capacity"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "storefront\n  Arrival: 3" in completed.stdout
 
 
 def test_inventory_command_displays_default_state(capsys) -> None:  # type: ignore[no-untyped-def]

@@ -17,15 +17,17 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 5: Time and Events — **complete**
 - Chapter 6: Direct Synchronization — **complete**
 - Chapter 7: Queues — **complete**
+- Chapter 8: Workers and Capacity — **complete**
 
-Next: **Chapter 8 — Workers and Capacity**
+Next: **Chapter 9 — Multiple Workers**
 
 The laboratory now records inventory events and derives current inventory by
 replaying an immutable ledger. Projections can be compared with that authority
 and manually refreshed. Projections can be refreshed directly or through a FIFO
-queue. One deterministic worker processes one request per scheduled action, and
-queue depth can be inspected while projections wait. Failures, retries, multiple
-workers, and variable processing time are not implemented, and this is not
+queue. Work now takes fixed simulated time: one worker can process only one
+request at once, queue depth and wait time can grow, and projections update at
+completion. Multiple workers, failures, retries, and random service times are
+not implemented, and this is not
 production synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
@@ -34,7 +36,8 @@ Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
 [Inventory Projections](book/04-projections.md), followed by
 [Time and Events](book/05-time-and-events.md), then
 [Direct Synchronization](book/06-direct-synchronization.md), followed by
-[Queues](book/07-queues.md).
+[Queues](book/07-queues.md), and then [Workers and
+Capacity](book/08-workers-and-capacity.md).
 
 ## Quick start
 
@@ -53,6 +56,7 @@ docker compose run --rm lab inventory-sim projections
 docker compose run --rm lab inventory-sim timeline
 docker compose run --rm lab inventory-sim sync-direct
 docker compose run --rm lab inventory-sim sync-queue
+docker compose run --rm lab inventory-sim worker-capacity
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

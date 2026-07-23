@@ -6,6 +6,17 @@ from inventory_sim.authority import (
     InventoryCopy,
     compare_inventory,
 )
+from inventory_sim.capacity import (
+    CapacityQueue,
+    CapacityScenarioInspection,
+    RequestArrival,
+    SynchronizationWorkItem,
+    WorkerCapacityResult,
+    WorkerCompletion,
+    WorkerProcessingStart,
+    WorkerState,
+    run_worker_capacity_scenario,
+)
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import (
     Adjustment,
@@ -38,11 +49,13 @@ from inventory_sim.synchronization import (
     synchronize_directly,
 )
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 __all__ = [
     "Adjustment",
     "AuthoritativeInventoryRecord",
+    "CapacityQueue",
+    "CapacityScenarioInspection",
     "DirectSynchronizationExecution",
     "DirectSynchronizationResult",
     "InventoryComparison",
@@ -60,17 +73,24 @@ __all__ = [
     "EventExecution",
     "EventScheduler",
     "Receive",
+    "RequestArrival",
     "ReleaseReservation",
     "Reserve",
     "Ship",
     "SynchronizationQueue",
     "SynchronizationRequest",
     "SynchronizationWorker",
+    "SynchronizationWorkItem",
     "VirtualClock",
     "WorkerExecution",
+    "WorkerCapacityResult",
+    "WorkerCompletion",
+    "WorkerProcessingStart",
+    "WorkerState",
     "__version__",
     "compare_inventory",
     "run_direct_synchronization_scenario",
     "run_queue_synchronization_scenario",
+    "run_worker_capacity_scenario",
     "synchronize_directly",
 ]
