@@ -17,6 +17,11 @@ from inventory_sim.capacity import (
     WorkerState,
     run_worker_capacity_scenario,
 )
+from inventory_sim.duplicate_delivery import (
+    DuplicateDeliveryResult,
+    RequestDelivery,
+    run_duplicate_delivery_scenario,
+)
 from inventory_sim.freshness import (
     FreshnessObservation,
     FreshnessResult,
@@ -101,6 +106,7 @@ __all__ = [
     "CapacityScenarioInspection",
     "DirectSynchronizationExecution",
     "DirectSynchronizationResult",
+    "DuplicateDeliveryResult",
     "InventoryComparison",
     "FreshnessObservation",
     "FreshnessResult",
@@ -120,6 +126,7 @@ __all__ = [
     "EventScheduler",
     "Receive",
     "RequestArrival",
+    "RequestDelivery",
     "RevisionedInventoryState",
     "RevisionScenarioResult",
     "ReleaseReservation",
@@ -155,6 +162,7 @@ __all__ = [
     "measure_freshness",
     "observe_ledger_revisions",
     "run_direct_synchronization_scenario",
+    "run_duplicate_delivery_scenario",
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",

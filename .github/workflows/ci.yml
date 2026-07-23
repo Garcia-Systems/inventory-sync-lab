@@ -108,6 +108,9 @@ jobs:
       - name: Run Chapter 17 retry policies smoke check
         run: docker compose run --rm lab inventory-sim retries
 
+      - name: Run Chapter 18 duplicate delivery smoke check
+        run: docker compose run --rm lab inventory-sim duplicate-delivery
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
