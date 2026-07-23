@@ -19,6 +19,7 @@ from inventory_sim.idempotency import run_idempotency_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.multiple_projections import run_multiple_projections_scenario
+from inventory_sim.ordering import run_ordering_scenario
 from inventory_sim.out_of_order import run_out_of_order_scenario
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
@@ -76,6 +77,7 @@ def demo() -> int:
     print("Chapter 18 intentionally delivers the same request twice.")
     print("Chapter 19 makes repeated processing idempotent.")
     print("Chapter 20 demonstrates intentional out-of-order delivery.")
+    print("Chapter 21 prevents projections from moving to older revisions.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -86,7 +88,8 @@ def demo() -> int:
         "`inventory-sim detect-stale`, `inventory-sim reject-stale`, or "
         "`inventory-sim multiple-projections`, `inventory-sim fanout`, or "
         "`inventory-sim retries`, `inventory-sim duplicate-delivery`, or "
-        "`inventory-sim idempotency`, or `inventory-sim out-of-order` "
+        "`inventory-sim idempotency`, `inventory-sim out-of-order`, or "
+        "`inventory-sim ordering` "
         "to explore."
     )
     return 0
@@ -722,6 +725,30 @@ def out_of_order() -> int:
     return 0
 
 
+def ordering() -> int:
+    """Run the canonical Chapter 21 monotonic-ordering scenario."""
+    result = run_ordering_scenario()
+    print("Authority\n")
+    for snapshot in result.created_revisions:
+        print(f"Revision {snapshot.revision.value} created\n")
+    print("Delivery order\n")
+    for delivery in result.deliveries:
+        print(f"Revision {delivery.revision.value}\n")
+    print("Processing\n")
+    for delivery in result.deliveries:
+        print(f"Revision {delivery.revision.value}\n")
+        if delivery.projection_updated:
+            print("Projection updated\n")
+        else:
+            print("Older than current projection\n")
+            print("Update skipped\n")
+        print(f"Projection revision: {delivery.projection_revision_after.value}\n")
+    print(f"Final authority revision: {result.authority.revision.value}\n")
+    print(f"Final projection revision: {result.final_projection.revision.value}\n")
+    print("The projection never moves backward.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -789,6 +816,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "out-of-order", help="run the Chapter 20 out-of-order delivery scenario"
     )
+    subparsers.add_parser(
+        "ordering", help="run the Chapter 21 monotonic-ordering scenario"
+    )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -854,6 +884,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return idempotency()
     if args.command == "out-of-order":
         return out_of_order()
+    if args.command == "ordering":
+        return ordering()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
