@@ -15,6 +15,7 @@ from inventory_sim.capacity import run_worker_capacity_scenario
 from inventory_sim.freshness import run_freshness_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
+from inventory_sim.multiple_projections import run_multiple_projections_scenario
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.revisions import run_inventory_revisions_scenario
@@ -64,6 +65,7 @@ def demo() -> int:
     )
     print("Chapter 13 detects stale request revisions without rejecting work.")
     print("Chapter 14 rejects stale requests before they update a projection.")
+    print("Chapter 15 feeds three independent projections from one authority.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -71,7 +73,8 @@ def demo() -> int:
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
         "`inventory-sim freshness`, `inventory-sim revisions`, or "
-        "`inventory-sim detect-stale`, or `inventory-sim reject-stale` "
+        "`inventory-sim detect-stale`, `inventory-sim reject-stale`, or "
+        "`inventory-sim multiple-projections` "
         "to explore."
     )
     return 0
@@ -578,6 +581,27 @@ def reject_stale() -> int:
     return 0
 
 
+def multiple_projections() -> int:
+    """Run the canonical Chapter 15 multiple-projection scenario."""
+    result = run_multiple_projections_scenario()
+    authority = result.authority
+    print("Multiple Projections\n")
+    print("One authoritative inventory feeds three independent views.")
+    print("Storefront first receives stale Revision 3 and rejects it; Warehouse")
+    print("and Reporting accept Revision 6 and remain unaffected. Storefront then")
+    print("accepts a current request.\n")
+    print("Authority")
+    print(f"Revision: {authority.revision.value}")
+    print(f"Available: {authority.state.available}")
+    for item in result.final_projections:
+        print(f"\n{item.projection.system}")
+        print(f"Revision: {item.revision.value}")
+        print(f"Available: {item.projection.state.available}")
+    print("\nAll projections independently reached the same final revision.")
+    print("No retries, networking, event bus, or messaging infrastructure was used.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -630,6 +654,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "reject-stale", help="run the Chapter 14 stale-rejection scenario"
+    )
+    subparsers.add_parser(
+        "multiple-projections", help="run the Chapter 15 multiple-projection scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -684,6 +711,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return detect_stale()
     if args.command == "reject-stale":
         return reject_stale()
+    if args.command == "multiple-projections":
+        return multiple_projections()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

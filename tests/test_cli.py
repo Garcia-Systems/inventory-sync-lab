@@ -210,6 +210,33 @@ def test_package_module_supports_reject_stale_command() -> None:
     assert "Both workers complete normally" in completed.stdout
 
 
+def test_multiple_projections_command_reports_independent_views(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["multiple-projections"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Multiple Projections",
+        "Storefront first receives stale Revision 3 and rejects it",
+        "Authority\nRevision: 6\nAvailable: 18",
+        "Storefront\nRevision: 6\nAvailable: 18",
+        "Warehouse\nRevision: 6\nAvailable: 18",
+        "Reporting\nRevision: 6\nAvailable: 18",
+        "independently reached the same final revision",
+        "No retries, networking, event bus",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_multiple_projections_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "multiple-projections"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Reporting\nRevision: 6\nAvailable: 18" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out
