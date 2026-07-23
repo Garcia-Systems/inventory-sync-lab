@@ -237,6 +237,35 @@ def test_package_module_supports_multiple_projections_command() -> None:
     assert "Reporting\nRevision: 6\nAvailable: 18" in completed.stdout
 
 
+def test_retries_command_reports_attempts_and_summary(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["retries"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Revision 10",
+        "Storefront\nAttempt 1\nSuccess",
+        "Warehouse\nAttempt 1\nFailed",
+        "Retry scheduled",
+        "Attempt 2\nSuccess",
+        "Reporting\nAttempt 1\nSuccess",
+        "Requests created: 3",
+        "Attempts performed: 4",
+        "Retries required: 1",
+        "Successful synchronizations: 3",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_retries_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "retries"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Retries improved delivery" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out

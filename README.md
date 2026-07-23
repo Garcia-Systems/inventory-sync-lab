@@ -26,6 +26,7 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 14: Rejecting Stale Synchronizations — **complete**
 - Chapter 15: Multiple Projections — **complete**
 - Chapter 16: Fan-Out Synchronization — **complete**
+- Chapter 17: Retry Policies — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -38,9 +39,10 @@ completion. A deterministic fixed two-worker pool now allows multiple requests
 to be in progress during the same simulated interval. FIFO requests and numbered
 workers make assignment deterministic, while service time remains fixed.
 Chapter 10 demonstrates that authority can change while an earlier captured
-snapshot waits, leaving a successful projection update already obsolete. Real
-threads, failures, retries, and random service times are not implemented; this is not
-production synchronization. Start with
+snapshot waits, leaving a successful projection update already obsolete. Chapter
+17 adds one deterministic delivery failure and retry; real threads, random
+failures, and random service times are not implemented. This is not production
+synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
 [The Authoritative Source of Truth](book/02-authoritative-source-of-truth.md).
@@ -57,7 +59,8 @@ Revisions](book/12-inventory-revisions.md), followed by [Detecting Stale
 Synchronizations](book/13-detecting-stale-synchronizations.md), and then
 [Rejecting Stale Synchronizations](book/14-rejecting-stale-synchronizations.md).
 Continue with [Multiple Projections](book/15-multiple-projections.md), followed by
-[Fan-Out Synchronization](book/16-fan-out-synchronization.md).
+[Fan-Out Synchronization](book/16-fan-out-synchronization.md), and then [Retry
+Policies](book/17-retry-policies.md).
 
 ## Quick start
 
@@ -85,6 +88,7 @@ docker compose run --rm lab inventory-sim detect-stale
 docker compose run --rm lab inventory-sim reject-stale
 docker compose run --rm lab inventory-sim multiple-projections
 docker compose run --rm lab inventory-sim fanout
+docker compose run --rm lab inventory-sim retries
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
