@@ -162,7 +162,11 @@ class WorkerState:
         )
 
     def complete(
-        self, *, projections: ProjectionRegistry, current_time: int
+        self,
+        *,
+        projections: ProjectionRegistry,
+        current_time: int,
+        update_projection: bool = True,
     ) -> WorkerCompletion:
         """Complete current work at its scheduled time and become idle."""
         now = _nonnegative_time(current_time, name="current time")
@@ -172,6 +176,8 @@ class WorkerState:
             raise RuntimeError("idle worker has no request to complete")
         if now != self._completes_at:
             raise ValueError("work must complete at its scheduled completion time")
+        if not isinstance(update_projection, bool):
+            raise TypeError("update projection must be a boolean")
 
         item = self._current
         started_at = self._started_at
@@ -181,13 +187,18 @@ class WorkerState:
         before_difference = before.compare_to(
             request.authoritative_state
         ).available_difference
-        after = synchronize_directly(
-            projection=before, authoritative_state=request.authoritative_state
+        after = (
+            synchronize_directly(
+                projection=before, authoritative_state=request.authoritative_state
+            )
+            if update_projection
+            else before
         )
         after_difference = after.compare_to(
             request.authoritative_state
         ).available_difference
-        projections.replace(after)
+        if update_projection:
+            projections.replace(after)
         completion = WorkerCompletion(
             request.system,
             item.arrived_at,

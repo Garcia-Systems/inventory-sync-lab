@@ -20,6 +20,7 @@ from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.revisions import run_inventory_revisions_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
 from inventory_sim.stale_detection import run_stale_detection_scenario
+from inventory_sim.stale_rejection import run_stale_rejection_scenario
 from inventory_sim.stale_snapshots import run_stale_snapshots_scenario
 from inventory_sim.synchronization import run_direct_synchronization_scenario
 from inventory_sim.worker_pool import run_multiple_workers_scenario
@@ -62,6 +63,7 @@ def demo() -> int:
         "of quantity."
     )
     print("Chapter 13 detects stale request revisions without rejecting work.")
+    print("Chapter 14 rejects stale requests before they update a projection.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -69,7 +71,7 @@ def demo() -> int:
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
         "`inventory-sim freshness`, `inventory-sim revisions`, or "
-        "`inventory-sim detect-stale` "
+        "`inventory-sim detect-stale`, or `inventory-sim reject-stale` "
         "to explore."
     )
     return 0
@@ -547,6 +549,35 @@ def detect_stale() -> int:
     return 0
 
 
+def reject_stale() -> int:
+    """Run the canonical Chapter 14 stale-rejection scenario."""
+    result = run_stale_rejection_scenario()
+    print("Rejecting Stale Synchronizations\n")
+    print("Time 1 — Request A captures Revision 2.")
+    print("Time 2 — Authority advances to Revision 4.")
+    print("Time 3 — Request B captures Revision 4.")
+    print("Time 4 — Workers begin processing.\n")
+    for inspection in result.inspections:
+        print(f"Worker: {inspection.worker_name}\n")
+        print(f"Request revision: {inspection.request_revision.value}")
+        print(f"Authority revision: {inspection.authority_revision.value}\n")
+        print(
+            f"Result: {'ACCEPTED' if inspection.projection_updated else 'REJECTED'}\n"
+        )
+        if inspection.projection_updated:
+            print("Projection updated.\n")
+        else:
+            print(f"Reason: {inspection.rejection_reason}.")
+            print("Projection unchanged.\n")
+    print(f"Time {result.final_time} — Both workers complete normally.\n")
+    print("Summary")
+    print(f"Accepted requests: {result.accepted_requests}")
+    print(f"Rejected requests: {result.rejected_requests}")
+    print(f"Final authoritative revision: {result.authority_revision.value}")
+    print(f"Final projection revision: {result.projection_revision.value}")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -596,6 +627,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "detect-stale", help="run the Chapter 13 stale-detection scenario"
+    )
+    subparsers.add_parser(
+        "reject-stale", help="run the Chapter 14 stale-rejection scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -648,6 +682,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return revisions()
     if args.command == "detect-stale":
         return detect_stale()
+    if args.command == "reject-stale":
+        return reject_stale()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

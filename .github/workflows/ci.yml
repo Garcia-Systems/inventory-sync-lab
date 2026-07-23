@@ -96,6 +96,9 @@ jobs:
       - name: Run Chapter 13 stale detection smoke check
         run: docker compose run --rm lab inventory-sim detect-stale
 
+      - name: Run Chapter 14 stale rejection smoke check
+        run: docker compose run --rm lab inventory-sim reject-stale
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
