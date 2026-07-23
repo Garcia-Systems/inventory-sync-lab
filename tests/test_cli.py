@@ -104,6 +104,28 @@ def test_package_module_supports_stale_snapshots_command() -> None:
     assert "copied snapshot became outdated" in completed.stdout
 
 
+def test_freshness_command_reports_measured_values(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["freshness"]) == 0
+    output = capsys.readouterr().out
+    assert "Measuring Freshness" in output
+    assert "Request    Wait    Service    Snapshot Age" in output
+    assert "A          0       3          0" in output
+    assert "B          2       3          2" in output
+    assert "C          5       3          5" in output
+    assert "No request was rejected" in output
+
+
+def test_package_module_supports_freshness_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "freshness"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Time 9 — Request C completes" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out

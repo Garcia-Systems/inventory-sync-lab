@@ -12,6 +12,7 @@ from inventory_sim.authority import (
     compare_inventory,
 )
 from inventory_sim.capacity import run_worker_capacity_scenario
+from inventory_sim.freshness import run_freshness_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
@@ -53,12 +54,14 @@ def demo() -> int:
     print("No operating-system concurrency, worker failures, or retries are used.")
     print("Service time remains fixed. Random latency is not implemented.")
     print("Chapter 10 introduces changing authority while work is waiting.")
+    print("Chapter 11 measures queue wait, service time, and snapshot age.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
-        "`inventory-sim multiple-workers`, or `inventory-sim stale-snapshots` "
+        "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
+        "`inventory-sim freshness` "
         "to explore."
     )
     return 0
@@ -469,6 +472,31 @@ def stale_snapshots() -> int:
     return 0
 
 
+def freshness() -> int:
+    """Run the canonical Chapter 11 freshness-measurement scenario."""
+    result = run_freshness_scenario()
+    print("Measuring Freshness\n")
+    print("Time 0 — Request A captures authority and starts immediately.")
+    print("Time 1 — Requests B and C capture authority and enter the queue.")
+    print("Time 3 — Request A completes.")
+    print("Time 4 — Authority changes while later requests are in flight.")
+    print("Time 6 — Request B completes.")
+    print("Time 7 — Authority changes again while request C is in flight.")
+    print("Time 9 — Request C completes.\n")
+    print("Request    Wait    Service    Snapshot Age")
+    print("-------------------------------------------")
+    for observation in result.observations:
+        print(
+            f"{observation.request:<11}"
+            f"{observation.wait_time:<8}"
+            f"{observation.service_time:<11}"
+            f"{observation.snapshot_age}"
+        )
+    print("\nAll values are simulated timing observations.")
+    print("No request was rejected and no freshness policy was applied.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -509,6 +537,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "stale-snapshots", help="run the Chapter 10 stale-snapshot scenario"
+    )
+    subparsers.add_parser(
+        "freshness", help="run the Chapter 11 freshness-measurement scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -555,6 +586,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return multiple_workers()
     if args.command == "stale-snapshots":
         return stale_snapshots()
+    if args.command == "freshness":
+        return freshness()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
