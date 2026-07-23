@@ -9,5 +9,6 @@ htmlcov/
 .venv/
 dist/
 build/
+.release-venv/
 results/*
 !results/.gitkeep

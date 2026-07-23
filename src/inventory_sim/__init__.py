@@ -135,7 +135,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.16.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "Adjustment",
