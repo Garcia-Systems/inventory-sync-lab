@@ -148,6 +148,36 @@ def test_package_module_supports_revisions_command() -> None:
     assert "Synchronization requests still copy their snapshots" in completed.stdout
 
 
+def test_detect_stale_command_observes_and_continues(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["detect-stale"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Detecting Stale Synchronizations",
+        "Worker: worker-1",
+        "Request revision: 2",
+        "Authority revision: 4",
+        "Stale request: YES",
+        "Worker: worker-2",
+        "Request revision: 4",
+        "Stale request: NO",
+        "Continuing synchronization...",
+        "Both requests were processed",
+        "no request was rejected",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_detect_stale_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "detect-stale"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Detection was an observation only" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out

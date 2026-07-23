@@ -54,6 +54,13 @@ from inventory_sim.revisions import (
     run_inventory_revisions_scenario,
 )
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
+from inventory_sim.stale_detection import (
+    StaleDetection,
+    StaleDetectionResult,
+    WorkerStaleInspection,
+    detect_stale_request,
+    run_stale_detection_scenario,
+)
 from inventory_sim.stale_snapshots import (
     StaleSnapshotInspection,
     StaleSnapshotsResult,
@@ -74,7 +81,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.12.0"
+__version__ = "0.13.0"
 
 __all__ = [
     "Adjustment",
@@ -113,18 +120,22 @@ __all__ = [
     "SynchronizationWorkItem",
     "StaleSnapshotInspection",
     "StaleSnapshotsResult",
+    "StaleDetection",
+    "StaleDetectionResult",
     "VirtualClock",
     "WorkerExecution",
     "WorkerCapacityResult",
     "WorkerCompletion",
     "WorkerProcessingStart",
     "WorkerState",
+    "WorkerStaleInspection",
     "WorkerInspection",
     "WorkerPool",
     "MultipleWorkersInspection",
     "MultipleWorkersResult",
     "__version__",
     "compare_inventory",
+    "detect_stale_request",
     "measure_freshness",
     "observe_ledger_revisions",
     "run_direct_synchronization_scenario",
@@ -132,6 +143,7 @@ __all__ = [
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",
     "run_stale_snapshots_scenario",
+    "run_stale_detection_scenario",
     "run_freshness_scenario",
     "run_inventory_revisions_scenario",
     "synchronize_directly",

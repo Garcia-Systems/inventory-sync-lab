@@ -22,8 +22,9 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 10: Stale Snapshots — **complete**
 - Chapter 11: Measuring Freshness — **complete**
 - Chapter 12: Inventory Revisions — **complete**
+- Chapter 13: Detecting Stale Synchronizations — **complete**
 
-Next: deciding how ordering information should be used.
+Next: introducing a policy decision for stale work.
 
 The laboratory now records inventory events and derives current inventory by
 replaying an immutable ledger. Projections can be compared with that authority
@@ -49,7 +50,8 @@ Capacity](book/08-workers-and-capacity.md), followed by [Multiple
 Workers](book/09-multiple-workers.md), and then [Stale
 Snapshots](book/10-stale-snapshots.md), followed by [Measuring
 Freshness](book/11-measuring-freshness.md), and then [Inventory
-Revisions](book/12-inventory-revisions.md).
+Revisions](book/12-inventory-revisions.md), followed by [Detecting Stale
+Synchronizations](book/13-detecting-stale-synchronizations.md).
 
 ## Quick start
 
@@ -73,6 +75,7 @@ docker compose run --rm lab inventory-sim multiple-workers
 docker compose run --rm lab inventory-sim stale-snapshots
 docker compose run --rm lab inventory-sim freshness
 docker compose run --rm lab inventory-sim revisions
+docker compose run --rm lab inventory-sim detect-stale
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
