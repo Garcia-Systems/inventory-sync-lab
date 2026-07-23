@@ -19,6 +19,7 @@ from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.revisions import run_inventory_revisions_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
+from inventory_sim.stale_detection import run_stale_detection_scenario
 from inventory_sim.stale_snapshots import run_stale_snapshots_scenario
 from inventory_sim.synchronization import run_direct_synchronization_scenario
 from inventory_sim.worker_pool import run_multiple_workers_scenario
@@ -60,13 +61,15 @@ def demo() -> int:
         "Chapter 12 adds revisions that order inventory states independently "
         "of quantity."
     )
+    print("Chapter 13 detects stale request revisions without rejecting work.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
-        "`inventory-sim freshness`, or `inventory-sim revisions` "
+        "`inventory-sim freshness`, `inventory-sim revisions`, or "
+        "`inventory-sim detect-stale` "
         "to explore."
     )
     return 0
@@ -522,6 +525,28 @@ def revisions() -> int:
     return 0
 
 
+def detect_stale() -> int:
+    """Run the canonical Chapter 13 stale-detection scenario."""
+    result = run_stale_detection_scenario()
+    print("Detecting Stale Synchronizations\n")
+    print("Time 1 — Request A captures Revision 2.")
+    print("Time 2 — Authority advances to Revision 4.")
+    print("Time 3 — Request B captures Revision 4.")
+    print("Time 4 — Workers begin processing.\n")
+    for inspection in result.inspections:
+        detection = inspection.detection
+        print(f"Worker: {inspection.worker_name}")
+        print(f"System: {inspection.system}\n")
+        print(f"Request revision: {detection.request_revision.value}")
+        print(f"Authority revision: {detection.authority_revision.value}\n")
+        print(f"Stale request: {'YES' if detection.stale else 'NO'}\n")
+        print("Continuing synchronization...\n")
+    print(f"Time {result.final_time} — Both synchronizations complete.")
+    print("Both requests were processed, including the stale request.")
+    print("Detection was an observation only; no request was rejected.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -568,6 +593,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "revisions", help="run the Chapter 12 inventory-revision scenario"
+    )
+    subparsers.add_parser(
+        "detect-stale", help="run the Chapter 13 stale-detection scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -618,6 +646,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return freshness()
     if args.command == "revisions":
         return revisions()
+    if args.command == "detect-stale":
+        return detect_stale()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
