@@ -1,4 +1,4 @@
-# Inventory Projections
+# Chapter 4: Inventory Projections
 
 Chapter 3 made the ledger the record of what happened and derived current
 inventory by replaying it. This chapter asks how other systems can use that

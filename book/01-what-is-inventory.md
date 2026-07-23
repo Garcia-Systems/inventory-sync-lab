@@ -1,4 +1,4 @@
-# What Is Inventory?
+# Chapter 1: What Is Inventory?
 
 Chapter 0 built a trustworthy laboratory. This chapter adds its first inventory
 concept: a small representation of the **current state**. It does not record how

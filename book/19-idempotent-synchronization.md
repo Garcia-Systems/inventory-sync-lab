@@ -1,4 +1,4 @@
-# Chapter 19 — Idempotent Synchronization
+# Chapter 19: Idempotent Synchronization
 
 ## Educational question
 

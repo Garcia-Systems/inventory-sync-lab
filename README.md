@@ -1,6 +1,7 @@
 # Inventory Synchronization Laboratory
 
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+[![Continuous Integration](https://github.com/Garcia-Systems/inventory-sync-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Garcia-Systems/inventory-sync-lab/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An executable engineering textbook for learning inventory synchronization and
@@ -162,6 +163,8 @@ source module, and place in the end-to-end flow.
 | [`experiments/`](experiments/README.md) | Reserved experiment area and its reproducibility rules. |
 | [`results/`](results/.gitkeep) | Reserved output area; generated results are not textbook claims. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to extend the book without breaking its teaching model. |
+| [`CHANGELOG.md`](CHANGELOG.md) | User-visible history of published releases. |
+| [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) | Draft notes for the first public release. |
 
 ## Supported Python API
 

@@ -1,4 +1,4 @@
-# Chapter 14 — Rejecting Stale Synchronizations
+# Chapter 14: Rejecting Stale Synchronizations
 
 ## Educational question
 

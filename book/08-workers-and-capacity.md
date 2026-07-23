@@ -1,4 +1,4 @@
-# Workers and Capacity
+# Chapter 8: Workers and Capacity
 
 Chapter 7 separated requesting synchronization from performing it, but each
 scheduled worker action completed a request instantly. That hides a fundamental

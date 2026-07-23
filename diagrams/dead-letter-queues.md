@@ -1,4 +1,4 @@
-# Dead Letter Queues
+# Dead-Letter Queues
 
 ```text
 Synchronization Request

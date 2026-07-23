@@ -1,4 +1,4 @@
-# Deterministic timeline
+# Deterministic Timeline
 
 ```text
 0          2             5                 8

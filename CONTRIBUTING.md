@@ -90,7 +90,8 @@ logic in its chapter module rather than in the CLI layer.
 
 ## Pull request checklist
 
-- [ ] The change answers one stated educational question.
+- [ ] The change has a stated purpose and stays within its educational or
+      maintenance scope.
 - [ ] Simulation inputs and ordering remain deterministic.
 - [ ] The chapter, CLI demonstration, tests, and relevant docs agree.
 - [ ] Any diagram supports the lesson without implying extra behavior.

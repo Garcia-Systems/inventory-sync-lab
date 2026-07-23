@@ -1,4 +1,4 @@
-# The Authoritative Source of Truth
+# Chapter 2: The Authoritative Source of Truth
 
 Chapter 1 represented a valid current inventory state. This chapter asks a new
 question: when several systems contain such states, which record does the

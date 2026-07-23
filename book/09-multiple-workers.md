@@ -1,4 +1,4 @@
-# Multiple Workers
+# Chapter 9: Multiple Workers
 
 ## 1. The problem: one worker is a capacity limit
 

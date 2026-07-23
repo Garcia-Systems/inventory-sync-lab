@@ -1,4 +1,4 @@
-# Release checklist
+# Release Checklist
 
 Use this checklist for `v1.0.0` and later releases. Run commands from a clean
 checkout using Python 3.13 or the repository's Docker environment. Do not create
@@ -21,6 +21,8 @@ the tag until every applicable check passes.
       the runtime version, and exercise the installed console script.
 - [ ] Review README installation commands, links, release notes, and rendered
       documentation for the release version.
+- [ ] Confirm the user-visible changes in `CHANGELOG.md` agree with the GitHub
+      Release draft in `docs/release-notes-vX.Y.Z.md`.
 - [ ] From the verified commit, create an annotated tag: `git tag -a vX.Y.Z -m
       "Inventory Synchronization Laboratory vX.Y.Z"`, then push it with `git
       push origin vX.Y.Z`.

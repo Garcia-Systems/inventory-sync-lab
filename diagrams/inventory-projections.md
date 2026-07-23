@@ -1,4 +1,4 @@
-# Inventory projections
+# Inventory Projections
 
 ```text
                          replay

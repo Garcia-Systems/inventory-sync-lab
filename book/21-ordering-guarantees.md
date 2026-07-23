@@ -1,4 +1,4 @@
-# Chapter 21 — Ordering Guarantees
+# Chapter 21: Ordering Guarantees
 
 ## Educational question
 

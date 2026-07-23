@@ -1,4 +1,4 @@
-# Chapter 20 — Out-of-Order Delivery
+# Chapter 20: Out-of-Order Delivery
 
 ## Educational question
 

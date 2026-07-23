@@ -1,4 +1,4 @@
-# Inventory state
+# Inventory State
 
 ```mermaid
 flowchart TD

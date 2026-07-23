@@ -1,4 +1,4 @@
-# Measuring freshness
+# Measuring Freshness
 
 ```mermaid
 flowchart TD

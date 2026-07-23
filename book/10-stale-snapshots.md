@@ -1,4 +1,4 @@
-# Stale Snapshots
+# Chapter 10: Stale Snapshots
 
 ## Educational question
 

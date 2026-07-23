@@ -1,4 +1,4 @@
-# Queued synchronization
+# Queued Synchronization
 
 ```text
 Synchronization request

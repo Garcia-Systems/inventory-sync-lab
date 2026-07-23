@@ -1,4 +1,4 @@
-# Time and Events
+# Chapter 5: Time and Events
 
 Chapter 4 required a person to refresh a projection. Before deciding how a
 future simulation triggers such work, we need a repeatable answer to **when**

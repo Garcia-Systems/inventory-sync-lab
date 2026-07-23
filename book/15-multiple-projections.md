@@ -1,4 +1,4 @@
-# Chapter 15 — Multiple Projections
+# Chapter 15: Multiple Projections
 
 ## Educational question
 
