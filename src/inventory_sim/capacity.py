@@ -67,6 +67,7 @@ class WorkerProcessingStart:
     completes_at: int
     queue_depth_after: int
     wait_time: int
+    worker_name: str = "worker-1"
 
 
 @dataclass(frozen=True)
@@ -84,16 +85,22 @@ class WorkerCompletion:
     projection_after: InventoryProjection
     available_difference_before: int
     available_difference_after: int
+    worker_name: str = "worker-1"
 
 
 class WorkerState:
     """One simulated worker with a fixed service time."""
 
-    def __init__(self, service_time: int) -> None:
+    def __init__(self, service_time: int, name: str = "worker-1") -> None:
         validated = _nonnegative_time(service_time, name="service time")
         if validated == 0:
             raise ValueError("service time must be positive")
         self._service_time = validated
+        if not isinstance(name, str):
+            raise TypeError("worker name must be a string")
+        if not name.strip():
+            raise ValueError("worker name cannot be empty or whitespace")
+        self._name = name
         self._current: SynchronizationWorkItem | None = None
         self._started_at: int | None = None
         self._completes_at: int | None = None
@@ -101,6 +108,11 @@ class WorkerState:
     @property
     def service_time(self) -> int:
         return self._service_time
+
+    @property
+    def name(self) -> str:
+        """Return this worker's stable, readable identity."""
+        return self._name
 
     @property
     def current(self) -> SynchronizationWorkItem | None:
@@ -146,6 +158,7 @@ class WorkerState:
             self._completes_at,
             queue.depth,
             now - item.arrived_at,
+            self.name,
         )
 
     def complete(
@@ -187,6 +200,7 @@ class WorkerState:
             after,
             before_difference,
             after_difference,
+            self.name,
         )
         self._current = None
         self._started_at = None

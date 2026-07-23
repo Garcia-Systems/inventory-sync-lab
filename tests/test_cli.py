@@ -27,11 +27,50 @@ def test_demo_explains_current_status(capsys) -> None:  # type: ignore[no-untype
     assert "FIFO request processing" in output
     assert "Chapter 8 adds fixed processing time" in output
     assert "One worker is BUSY" in output
-    assert "Multiple workers, failures, and retries are not implemented" in output
+    assert "fixed two-worker pool" in output
     assert "Random latency is not implemented" in output
-    assert "Chapter 9 introduces multiple workers" in output
+    assert "Chapter 10 introduces changing authority" in output
     assert "Chapter 3 adds an inventory ledger" in output
     assert "inventory-sim inventory" in output
+
+
+def test_multiple_workers_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["multiple-workers"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Multiple Workers",
+        "Workers: 2",
+        "Service time: 3 ticks",
+        "website\n  Worker: worker-1",
+        "marketplace\n  Worker: worker-2",
+        "storefront\n  Worker: worker-1",
+        "partner\n  Worker: worker-2",
+        "Completion: 4",
+        "Completion: 7",
+        "Wait: 0",
+        "Wait: 2",
+        "Wait: 1",
+        "Inspection at time 8",
+        "worker-1: IDLE",
+        "worker-2: IDLE",
+        "Maximum queue depth: 2",
+        "Final queue depth: 0",
+        "Final simulated time: 8",
+        "assignment deterministic",
+        "No threads",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_multiple_workers_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "multiple-workers"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Average wait time: 0.75 ticks" in completed.stdout
 
 
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]

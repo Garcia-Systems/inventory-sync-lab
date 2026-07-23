@@ -18,16 +18,19 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 6: Direct Synchronization — **complete**
 - Chapter 7: Queues — **complete**
 - Chapter 8: Workers and Capacity — **complete**
+- Chapter 9: Multiple Workers — **complete**
 
-Next: **Chapter 9 — Multiple Workers**
+Next: **Chapter 10 — Stale Snapshots**
 
 The laboratory now records inventory events and derives current inventory by
 replaying an immutable ledger. Projections can be compared with that authority
 and manually refreshed. Projections can be refreshed directly or through a FIFO
 queue. Work now takes fixed simulated time: one worker can process only one
 request at once, queue depth and wait time can grow, and projections update at
-completion. Multiple workers, failures, retries, and random service times are
-not implemented, and this is not
+completion. A deterministic fixed two-worker pool now allows multiple requests
+to be in progress during the same simulated interval. FIFO requests and numbered
+workers make assignment deterministic, while service time remains fixed. Real
+threads, failures, retries, and random service times are not implemented; this is not
 production synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
@@ -37,7 +40,8 @@ Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
 [Time and Events](book/05-time-and-events.md), then
 [Direct Synchronization](book/06-direct-synchronization.md), followed by
 [Queues](book/07-queues.md), and then [Workers and
-Capacity](book/08-workers-and-capacity.md).
+Capacity](book/08-workers-and-capacity.md), followed by [Multiple
+Workers](book/09-multiple-workers.md).
 
 ## Quick start
 
@@ -57,6 +61,7 @@ docker compose run --rm lab inventory-sim timeline
 docker compose run --rm lab inventory-sim sync-direct
 docker compose run --rm lab inventory-sim sync-queue
 docker compose run --rm lab inventory-sim worker-capacity
+docker compose run --rm lab inventory-sim multiple-workers
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

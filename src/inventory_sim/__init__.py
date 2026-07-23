@@ -48,8 +48,15 @@ from inventory_sim.synchronization import (
     run_direct_synchronization_scenario,
     synchronize_directly,
 )
+from inventory_sim.worker_pool import (
+    MultipleWorkersInspection,
+    MultipleWorkersResult,
+    WorkerInspection,
+    WorkerPool,
+    run_multiple_workers_scenario,
+)
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 __all__ = [
     "Adjustment",
@@ -87,10 +94,15 @@ __all__ = [
     "WorkerCompletion",
     "WorkerProcessingStart",
     "WorkerState",
+    "WorkerInspection",
+    "WorkerPool",
+    "MultipleWorkersInspection",
+    "MultipleWorkersResult",
     "__version__",
     "compare_inventory",
     "run_direct_synchronization_scenario",
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
+    "run_multiple_workers_scenario",
     "synchronize_directly",
 ]
