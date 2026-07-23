@@ -114,6 +114,12 @@ jobs:
       - name: Run Chapter 19 idempotency smoke check
         run: docker compose run --rm lab inventory-sim idempotency
 
+      - name: Run Chapter 20 out-of-order delivery smoke check
+        run: docker compose run --rm lab inventory-sim out-of-order
+
+      - name: Run Chapter 21 ordering guarantees smoke check
+        run: docker compose run --rm lab inventory-sim ordering
+
       - name: Verify coverage report
         run: test -s coverage.xml
 

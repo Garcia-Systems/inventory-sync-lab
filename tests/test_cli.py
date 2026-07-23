@@ -726,3 +726,32 @@ def test_package_module_supports_out_of_order_command() -> None:
     )
     assert completed.returncode == 0
     assert "Final projection revision: 13" in completed.stdout
+
+
+def test_ordering_command_explains_monotonic_projection(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["ordering"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Revision 13 created",
+        "Revision 14 created",
+        "Delivery order\n\nRevision 14\n\nRevision 13",
+        "Revision 14\n\nProjection updated",
+        "Projection revision: 14",
+        "Revision 13\n\nOlder than current projection",
+        "Update skipped",
+        "Final authority revision: 14",
+        "Final projection revision: 14",
+        "The projection never moves backward.",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_ordering_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "ordering"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Final projection revision: 14" in completed.stdout
