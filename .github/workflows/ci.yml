@@ -111,6 +111,9 @@ jobs:
       - name: Run Chapter 18 duplicate delivery smoke check
         run: docker compose run --rm lab inventory-sim duplicate-delivery
 
+      - name: Run Chapter 19 idempotency smoke check
+        run: docker compose run --rm lab inventory-sim idempotency
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
