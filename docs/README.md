@@ -24,6 +24,8 @@ it; this directory explains how to study and interpret it.
 - [Tests](../tests/test_package.py)
 - [Experiments policy](../experiments/README.md)
 - [Contributor guide](../CONTRIBUTING.md)
+- [Release notes for v1.0.0](release-notes-v1.0.0.md)
+- [Changelog](../CHANGELOG.md)
 - [Release checklist](release-checklist.md)
 
 After the architecture overview, continue to the [end-to-end laboratory](../book/23-end-to-end-operations-laboratory.md)

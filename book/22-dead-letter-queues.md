@@ -1,4 +1,4 @@
-# Chapter 22 — Dead Letter Queues
+# Chapter 22: Dead Letter Queues
 
 ## Educational question
 

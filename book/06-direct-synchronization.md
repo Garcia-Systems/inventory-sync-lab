@@ -1,4 +1,4 @@
-# Direct Synchronization
+# Chapter 6: Direct Synchronization
 
 ## 1. The problem: from manual refresh to scheduled synchronization
 

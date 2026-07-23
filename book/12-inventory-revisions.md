@@ -1,4 +1,4 @@
-# Chapter 12 — Inventory Revisions
+# Chapter 12: Inventory Revisions
 
 ## Educational question
 

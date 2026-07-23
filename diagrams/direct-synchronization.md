@@ -1,4 +1,4 @@
-# Direct synchronization
+# Direct Synchronization
 
 ```text
 Authoritative state: available 7

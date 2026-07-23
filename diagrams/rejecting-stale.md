@@ -1,4 +1,4 @@
-# Rejecting stale synchronization
+# Rejecting a Stale Synchronization
 
 ```text
                          Authority Revision 5

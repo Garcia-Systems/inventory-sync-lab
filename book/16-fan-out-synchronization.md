@@ -1,4 +1,4 @@
-# Chapter 16 — Fan-Out Synchronization
+# Chapter 16: Fan-Out Synchronization
 
 ## Educational question
 

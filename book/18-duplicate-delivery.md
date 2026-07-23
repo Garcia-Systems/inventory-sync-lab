@@ -1,4 +1,4 @@
-# Chapter 18 — Duplicate Delivery
+# Chapter 18: Duplicate Delivery
 
 ## Educational question
 

@@ -1,4 +1,4 @@
-# Chapter 11 — Measuring Freshness
+# Chapter 11: Measuring Freshness
 
 ## Educational question
 

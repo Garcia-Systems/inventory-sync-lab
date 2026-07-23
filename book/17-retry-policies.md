@@ -1,4 +1,4 @@
-# Chapter 17 — Retry Policies
+# Chapter 17: Retry Policies
 
 ## Educational question
 

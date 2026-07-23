@@ -1,4 +1,4 @@
-# Detecting a stale synchronization
+# Detecting a Stale Synchronization
 
 ```text
 Authoritative inventory — Revision 5

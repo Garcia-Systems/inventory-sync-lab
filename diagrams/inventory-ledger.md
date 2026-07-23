@@ -1,4 +1,4 @@
-# Inventory ledger
+# Inventory Ledger
 
 ```text
 Receive 10 ─┐

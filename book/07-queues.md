@@ -1,4 +1,4 @@
-# Queues
+# Chapter 7: Queues
 
 Chapter 6 scheduled a direct synchronization. This chapter adds one idea:
 synchronization work can wait in a queue before a worker performs it.

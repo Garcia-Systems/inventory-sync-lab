@@ -1,4 +1,4 @@
-# Multiple workers
+# Multiple Workers
 
 ```text
 Time       1            4            7            8

@@ -1,4 +1,4 @@
-# Setting Up Your Laboratory
+# Chapter 0: Setting Up Your Laboratory
 
 This chapter prepares a consistent place to read, run examples, and check your work. You do not need prior Docker or Python experience. We will verify the tools carefully before later chapters add any subject-matter code.
 

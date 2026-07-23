@@ -1,4 +1,4 @@
-# Multiple projections
+# Multiple Projections
 
 ```text
 Inventory Ledger

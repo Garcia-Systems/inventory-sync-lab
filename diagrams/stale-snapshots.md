@@ -1,4 +1,4 @@
-# Stale snapshots
+# Stale Snapshots
 
 ```text
 Simulated time     0              1              2           3 to 6       6

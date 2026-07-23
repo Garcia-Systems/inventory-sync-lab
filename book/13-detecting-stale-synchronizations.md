@@ -1,4 +1,4 @@
-# Chapter 13 — Detecting Stale Synchronizations
+# Chapter 13: Detecting Stale Synchronizations
 
 ## Educational question
 

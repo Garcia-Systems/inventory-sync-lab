@@ -1,4 +1,4 @@
-# Inventory revisions
+# Inventory Revisions
 
 ```mermaid
 flowchart TD

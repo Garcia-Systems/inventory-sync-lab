@@ -1,4 +1,4 @@
-# Authoritative inventory and copies
+# Authoritative Inventory and Copies
 
 ```mermaid
 flowchart TD

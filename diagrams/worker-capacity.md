@@ -1,4 +1,4 @@
-# Worker capacity
+# Worker Capacity
 
 ```text
 Worker:
