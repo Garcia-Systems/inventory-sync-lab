@@ -12,6 +12,7 @@ from inventory_sim.authority import (
     compare_inventory,
 )
 from inventory_sim.capacity import run_worker_capacity_scenario
+from inventory_sim.fanout import run_fanout_scenario
 from inventory_sim.freshness import run_freshness_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
@@ -66,6 +67,7 @@ def demo() -> int:
     print("Chapter 13 detects stale request revisions without rejecting work.")
     print("Chapter 14 rejects stale requests before they update a projection.")
     print("Chapter 15 feeds three independent projections from one authority.")
+    print("Chapter 16 fans one authority revision out into three requests.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -74,7 +76,7 @@ def demo() -> int:
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
         "`inventory-sim freshness`, `inventory-sim revisions`, or "
         "`inventory-sim detect-stale`, `inventory-sim reject-stale`, or "
-        "`inventory-sim multiple-projections` "
+        "`inventory-sim multiple-projections`, or `inventory-sim fanout` "
         "to explore."
     )
     return 0
@@ -602,6 +604,29 @@ def multiple_projections() -> int:
     return 0
 
 
+def fanout() -> int:
+    """Run the canonical Chapter 16 fan-out scenario."""
+    result = run_fanout_scenario()
+    print("Fan-Out Synchronization\n")
+    print(f"Authority advanced to Revision {result.authority.revision.value}\n")
+    print("Generating synchronization requests...\n")
+    for number, request in enumerate(result.requests, start=1):
+        print(f"{request.system:<12} -> Request {number}")
+    print("\nWorker processing...\n")
+    for projection in result.final_projections:
+        print(
+            f"{projection.projection.system} updated to "
+            f"Revision {projection.revision.value}"
+        )
+    print("\nSummary")
+    print(f"Authoritative revision: {result.authority.revision.value}")
+    print(f"Generated requests: {len(result.requests)}")
+    print(f"Projections updated: {len(result.completions)}")
+    print("\nOne inventory event became three independent work items.")
+    print("No retries, networking, or messaging infrastructure was used.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -658,6 +683,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "multiple-projections", help="run the Chapter 15 multiple-projection scenario"
     )
+    subparsers.add_parser("fanout", help="run the Chapter 16 fan-out scenario")
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -713,6 +739,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return reject_stale()
     if args.command == "multiple-projections":
         return multiple_projections()
+    if args.command == "fanout":
+        return fanout()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

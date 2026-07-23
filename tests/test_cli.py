@@ -578,3 +578,34 @@ def test_package_module_supports_sync_queue_command() -> None:
     assert "Processed: website" in completed.stdout
     assert "Processed: marketplace" in completed.stdout
     assert "Final simulated time: 8" in completed.stdout
+
+
+def test_fanout_command_reports_one_event_and_three_updates(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["fanout"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Fan-Out Synchronization",
+        "Authority advanced to Revision 8",
+        "Storefront   -> Request 1",
+        "Warehouse    -> Request 2",
+        "Reporting    -> Request 3",
+        "Storefront updated to Revision 8",
+        "Warehouse updated to Revision 8",
+        "Reporting updated to Revision 8",
+        "Authoritative revision: 8",
+        "Generated requests: 3",
+        "Projections updated: 3",
+        "No retries, networking, or messaging infrastructure",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_fanout_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "fanout"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "One inventory event became three independent work items" in completed.stdout
