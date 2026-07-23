@@ -3,137 +3,155 @@
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An executable engineering textbook for learning deterministic inventory synchronization.
+An executable engineering textbook for learning inventory synchronization and
+distributed-systems correctness through small, deterministic Python models.
+Volume I comprises Chapters 0–23 and is complete.
 
-This repository is **education-first**: the written guide introduces each idea before code implements it. Explanations, small Python programs, tests, and eventually reproducible experiments will work together so readers can inspect every claim.
+## What this project is
 
-## Current status
+The laboratory pairs a written chapter with executable source, a CLI
+demonstration, readable tests, and (where useful) a diagram. The prose introduces
+one problem at a time; the code makes the claim inspectable; the tests make the
+result repeatable. This is the project's **executable textbook** philosophy: do
+not merely read about stale state, retries, or ordering—run a controlled example
+and observe exactly why it behaves as described.
 
-- Chapter 0: Laboratory setup — **complete**
-- Chapter 1: What is inventory? — **complete**
-- Chapter 2: Authoritative source of truth — **complete**
-- Chapter 3: The inventory ledger — **complete**
-- Chapter 4: Inventory projections — **complete**
-- Chapter 5: Time and Events — **complete**
-- Chapter 6: Direct Synchronization — **complete**
-- Chapter 7: Queues — **complete**
-- Chapter 8: Workers and Capacity — **complete**
-- Chapter 9: Multiple Workers — **complete**
-- Chapter 10: Stale Snapshots — **complete**
-- Chapter 11: Measuring Freshness — **complete**
-- Chapter 12: Inventory Revisions — **complete**
-- Chapter 13: Detecting Stale Synchronizations — **complete**
-- Chapter 14: Rejecting Stale Synchronizations — **complete**
-- Chapter 15: Multiple Projections — **complete**
-- Chapter 16: Fan-Out Synchronization — **complete**
-- Chapter 17: Retry Policies — **complete**
-- Chapter 18: Duplicate Delivery — **complete**
-- Chapter 19: Idempotent Synchronization — **complete**
-- Chapter 20: Out-of-Order Delivery — **complete**
-- Chapter 21: Ordering Guarantees — **complete**
-- Chapter 22: Dead Letter Queues — **complete**
-- Chapter 23: End-to-End Operations Laboratory — **complete**
+This project is for software engineers, technical students, educators, and
+reviewers who want to build a precise mental model of inventory synchronization.
+Basic command-line familiarity helps, but the book assumes neither distributed-
+systems expertise nor prior knowledge of this repository.
 
-Stale work is now rejected before it can overwrite a current projection.
+## What this project is not
 
-The laboratory now records inventory events and derives current inventory by
-replaying an immutable ledger. Projections can be compared with that authority
-and manually refreshed. Projections can be refreshed directly or through a FIFO
-queue. Work now takes fixed simulated time: one worker can process only one
-request at once, queue depth and wait time can grow, and projections update at
-completion. A deterministic fixed two-worker pool now allows multiple requests
-to be in progress during the same simulated interval. FIFO requests and numbered
-workers make assignment deterministic, while service time remains fixed.
-Chapter 10 demonstrates that authority can change while an earlier captured
-snapshot waits, leaving a successful projection update already obsolete. Chapter
-17 adds one deterministic delivery failure and retry, Chapter 18 exposes duplicate
-delivery, and Chapter 19 makes its effects idempotent; real threads, random
-failures, and random service times are not implemented. Chapter 20 shows that
-distinct requests processed exactly once can still produce an incorrect result
-when delivered out of order. Chapter 21 adds a monotonic revision comparison so
-older requests cannot move a projection backward. Chapter 22 bounds retries and
-isolates terminal failures without stopping healthy
-work. This is not production synchronization. Start with
-[Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
-[What Is Inventory?](book/01-what-is-inventory.md), and then read
-[The Authoritative Source of Truth](book/02-authoritative-source-of-truth.md).
-Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
-[Inventory Projections](book/04-projections.md), followed by
-[Time and Events](book/05-time-and-events.md), then
-[Direct Synchronization](book/06-direct-synchronization.md), followed by
-[Queues](book/07-queues.md), and then [Workers and
-Capacity](book/08-workers-and-capacity.md), followed by [Multiple
-Workers](book/09-multiple-workers.md), and then [Stale
-Snapshots](book/10-stale-snapshots.md), followed by [Measuring
-Freshness](book/11-measuring-freshness.md), and then [Inventory
-Revisions](book/12-inventory-revisions.md), followed by [Detecting Stale
-Synchronizations](book/13-detecting-stale-synchronizations.md), and then
-[Rejecting Stale Synchronizations](book/14-rejecting-stale-synchronizations.md).
-Continue with [Multiple Projections](book/15-multiple-projections.md), followed by
-[Fan-Out Synchronization](book/16-fan-out-synchronization.md), and then [Retry
-Policies](book/17-retry-policies.md).
-Continue with [Duplicate Delivery](book/18-duplicate-delivery.md).
-Then read [Idempotent Synchronization](book/19-idempotent-synchronization.md).
-Continue with [Out-of-Order Delivery](book/20-out-of-order-delivery.md).
-Then read [Ordering Guarantees](book/21-ordering-guarantees.md).
-Continue with [Dead Letter Queues](book/22-dead-letter-queues.md).
-Conclude Volume I with the [End-to-End Operations
-Laboratory](book/23-end-to-end-operations-laboratory.md).
+This is not a production inventory service, framework, benchmark, or reference
+architecture. It deliberately has no networking, database, broker, operating-
+system concurrency, or random failures. Those omissions isolate the idea being
+taught and make every run reproducible. Read the dedicated [design philosophy](docs/design-philosophy.md)
+before interpreting these models as production advice.
 
-## Quick start
+## Start here
 
-Docker is the default development environment. From the repository root:
+1. Read [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md).
+2. Build the environment and run the health check below.
+3. Follow the [Volume I learning path](docs/learning-path.md) in chapter order.
+4. Run each chapter's CLI demonstration as you read it.
+5. Use the [documentation index](docs/README.md) whenever you need a map.
+
+### Prerequisites
+
+The supported, lowest-friction route requires Git, Docker, and the modern
+`docker compose` plugin. It does **not** require Python on the host. A code editor
+is useful for reading the Markdown and Python side by side. Docker may need
+network access the first time it downloads the base image and dependencies.
+
+### Install and verify with Docker
+
+From a clone of this repository:
 
 ```bash
 docker compose build
 docker compose run --rm lab inventory-sim doctor
-docker compose run --rm lab inventory-sim demo
-docker compose run --rm lab inventory-sim inventory \
-  --on-hand 10 \
-  --reserved 3
-docker compose run --rm lab inventory-sim authority
-docker compose run --rm lab inventory-sim ledger
-docker compose run --rm lab inventory-sim projections
-docker compose run --rm lab inventory-sim timeline
-docker compose run --rm lab inventory-sim sync-direct
-docker compose run --rm lab inventory-sim sync-queue
-docker compose run --rm lab inventory-sim worker-capacity
-docker compose run --rm lab inventory-sim multiple-workers
-docker compose run --rm lab inventory-sim stale-snapshots
-docker compose run --rm lab inventory-sim freshness
-docker compose run --rm lab inventory-sim revisions
-docker compose run --rm lab inventory-sim detect-stale
-docker compose run --rm lab inventory-sim reject-stale
-docker compose run --rm lab inventory-sim multiple-projections
-docker compose run --rm lab inventory-sim fanout
-docker compose run --rm lab inventory-sim retries
-docker compose run --rm lab inventory-sim duplicate-delivery
-docker compose run --rm lab inventory-sim idempotency
-docker compose run --rm lab inventory-sim out-of-order
-docker compose run --rm lab inventory-sim ordering
-docker compose run --rm lab inventory-sim dead-letter
+```
+
+The final line from `doctor` should be `Laboratory environment is ready.` The
+Compose service installs the package with its development dependencies and
+mounts the checkout at `/workspace`.
+
+If you intentionally prefer a host installation, use Python 3.13 or newer:
+
+```bash
+python3.13 -m venv .venv
+. .venv/bin/activate
+python -m pip install --editable '.[dev]'
+inventory-sim doctor
+```
+
+Docker remains the documented common environment for contributors and CI.
+
+## Run the textbook
+
+The CLI lists every demonstration and its chapter:
+
+```bash
+docker compose run --rm lab inventory-sim --help
+```
+
+For example, run the early inventory lesson and the Volume I capstone with:
+
+```bash
+docker compose run --rm lab inventory-sim inventory --on-hand 10 --reserved 3
 docker compose run --rm lab inventory-sim laboratory
+```
+
+Every chapter includes its exact command. The complete command-to-chapter table
+is in the [learning path](docs/learning-path.md).
+
+## Run the checks
+
+```bash
 docker compose run --rm lab pytest
+docker compose run --rm lab ruff check .
+docker compose run --rm lab ruff format --check .
+```
+
+To reproduce CI's branch-coverage report:
+
+```bash
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
   --cov-branch \
   --cov-report=term-missing \
   --cov-report=xml:coverage.xml
-docker compose run --rm lab ruff check .
-docker compose run --rm lab ruff format --check .
 ```
 
-pytest measures coverage of the application package; the report shows what the
-current tests exercised without claiming that the test suite is complete. CI runs
-these checks through Docker on pushes and pull requests. Codecov requires the
-repository owner to add one `CODECOV_TOKEN` Actions secret and may show no result
-until the first successful CI upload.
+Coverage reveals unexercised paths; it is not, by itself, proof of correctness.
+
+## How Volume I progresses
+
+Volume I is intentionally cumulative:
+
+1. **Foundations (Chapters 0–9)** establish inventory, authority, immutable
+   history and views, then deterministic time, queues, and worker capacity.
+2. **Correctness (Chapters 10–15)** exposes stale observations and adds
+   freshness, revisions, stale-update policies, and independent projections.
+3. **Reliable Distribution (Chapters 16–22)** adds fan-out, retries, duplicate
+   and out-of-order delivery, idempotency, ordering, and dead-letter queues.
+4. **Integration (Chapter 23)** composes only the mechanisms already learned
+   into one end-to-end operations laboratory.
+
+See the [learning path](docs/learning-path.md) for the rationale, chapter links,
+and runnable command for every step.
+
+## Architecture at a glance
+
+An immutable ledger is replayed into authoritative inventory. Immutable
+synchronization requests carry revisioned snapshots through deterministic queues
+and workers to projections. Retry, idempotency, monotonic ordering, and dead-
+letter policies are layered onto that same pipeline one at a time. A virtual
+clock and scheduler replace wall-clock timing, so outcomes never depend on
+machine speed or scheduling luck.
+
+The [architecture guide](docs/architecture.md) traces each concept to its chapter,
+source module, and place in the end-to-end flow.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| [`book/`](book/00-setting-up-your-laboratory.md) | The 24 chapters; read these in order. |
+| [`docs/`](docs/README.md) | Learning path, architecture, and project philosophy. |
+| [`src/inventory_sim/`](src/inventory_sim/__init__.py) | The executable package and supported root API. |
+| [`src/inventory_sim/cli/`](src/inventory_sim/cli/main.py) | CLI registration and chapter-oriented presentation. |
+| [`tests/`](tests/test_package.py) | Behavioral and CLI checks written as executable examples. |
+| [`diagrams/`](diagrams/end-to-end-operations-laboratory.md) | Focused diagrams linked from chapters and guides. |
+| [`experiments/`](experiments/README.md) | Reserved experiment area and its reproducibility rules. |
+| [`results/`](results/.gitkeep) | Reserved output area; generated results are not textbook claims. |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to extend the book without breaking its teaching model. |
 
 ## Supported Python API
 
-The names exported from `inventory_sim` and listed in `inventory_sim.__all__`
-are the supported Volume I Python API. Import core concepts from the package
-root rather than depending on how the chapters are split into modules:
+Names exported from `inventory_sim` and listed in `inventory_sim.__all__` are the
+supported Volume I Python API. Import core concepts from the package root:
 
 ```python
 from inventory_sim import InventoryLedger, InventoryState, Receive
@@ -141,27 +159,14 @@ from inventory_sim import InventoryProjection, RevisionedProjection
 from inventory_sim import EventScheduler, SynchronizationRequest, VirtualClock
 ```
 
-The root API includes the core inventory, projection, deterministic scheduling,
-queue, worker-pool, revision, retry, dead-letter, and operations-laboratory
-models and scenario entry points. Internal module paths may change in later
-volumes. Private helpers, the `inventory_sim.cli` implementation, and future
-`experiments` code are not stable public API; use the `inventory-sim` command
-when invoking the CLI.
+Internal module paths, CLI implementation details, and future experiment code
+are not stable public API. Use `inventory-sim` to invoke demonstrations.
 
-## Repository map
+## Contributing and license
 
-- `book/` contains the chapters that drive development.
-- `src/inventory_sim/` contains executable Python introduced by the book.
-- `tests/` contains readable checks for the examples and CLI.
-- `diagrams/` holds explanatory diagrams.
-- `experiments/` and `results/` are reserved for later, reproducible work.
+Start with the [contributor guide](CONTRIBUTING.md). Changes must preserve the
+book's concept order and deterministic learning environment. Garcia Systems may
+publish material derived from this project, but this repository is a standalone
+open-source educational project and is not part of its Laravel website.
 
-## Education and contributions
-
-Keep changes focused, readable, tested, and aligned with the chapter that introduces them. See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a change.
-
-Garcia Systems may publish material derived from this project. This repository is nevertheless a standalone open-source educational project; it is not part of the Garcia Systems Laravel website.
-
-## License
-
-The code and text in this repository are available under the [MIT License](LICENSE).
+Code and text are available under the [MIT License](LICENSE).
