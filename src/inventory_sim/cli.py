@@ -18,6 +18,7 @@ from inventory_sim.fanout import run_fanout_scenario
 from inventory_sim.freshness import run_freshness_scenario
 from inventory_sim.idempotency import run_idempotency_scenario
 from inventory_sim.inventory import InventoryState
+from inventory_sim.laboratory import run_laboratory_scenario
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.multiple_projections import run_multiple_projections_scenario
 from inventory_sim.ordering import run_ordering_scenario
@@ -80,6 +81,7 @@ def demo() -> int:
     print("Chapter 20 demonstrates intentional out-of-order delivery.")
     print("Chapter 21 prevents projections from moving to older revisions.")
     print("Chapter 22 isolates terminal failures in a dead letter queue.")
+    print("Chapter 23 combines the complete pipeline in one operations laboratory.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -91,7 +93,8 @@ def demo() -> int:
         "`inventory-sim multiple-projections`, `inventory-sim fanout`, or "
         "`inventory-sim retries`, `inventory-sim duplicate-delivery`, or "
         "`inventory-sim idempotency`, `inventory-sim out-of-order`, or "
-        "`inventory-sim ordering`, `inventory-sim dead-letter` "
+        "`inventory-sim ordering`, `inventory-sim dead-letter`, or "
+        "`inventory-sim laboratory` "
         "to explore."
     )
     return 0
@@ -781,6 +784,67 @@ def dead_letter() -> int:
     return 0
 
 
+def laboratory() -> int:
+    """Present Chapter 23's complete scenario as an operational walkthrough."""
+    result = run_laboratory_scenario()
+    latest = result.authorities[-1]
+    print("=== Ledger ===\n")
+    print(f"Recorded {len(result.ledger.events)} immutable inventory events.")
+    print("Receive and Reserve events replay in their recorded order.\n")
+    print("=== Authority ===\n")
+    print(f"Revision {latest.revision.value}: {latest.state}")
+    print(f"Available inventory: {latest.state.available}\n")
+    print("=== Fan-Out ===\n")
+    print("Revisions 15 and 16 each produce one request per projection.")
+    for request in result.requests:
+        print(f"Request {request.request_id} -> {request.system}")
+    print("\n=== Queue ===\n")
+    print("Immutable requests enter a deterministic FIFO CapacityQueue.")
+    print("The second wave also contains one duplicate and one delayed old request.\n")
+    print("=== Worker Pool ===\n")
+    print("Two fixed-time workers process requests without threads or real waiting.")
+    for operation in result.operations:
+        print(
+            f"Time {operation.time} — {operation.worker} — "
+            f"{operation.request.system} revision {operation.revision.value} "
+            f"attempt {operation.attempt}: {operation.outcome}"
+        )
+    print("\n=== Retry ===\n")
+    print(f"Retries requeue the same request: {result.summary.retries}\n")
+    print("=== Duplicate Delivery ===\n")
+    print(
+        "Storefront revision 16 is delivered twice; its second delivery is skipped.\n"
+    )
+    print("=== Ordering ===\n")
+    print("Warehouse revision 15 arrives after revision 16 and cannot move backward.\n")
+    print("=== Dead Letter Queue ===\n")
+    for entry in result.dead_letters:
+        print(
+            f"{entry.request.system} revision {entry.revision.value}: "
+            f"{entry.reason} after {entry.attempts} attempts"
+        )
+    print("\n=== Final Summary ===\n")
+    summary = result.summary
+    labels = (
+        ("Authority Revision", summary.authority_revision),
+        ("Registered Projections", summary.registered_projections),
+        ("Synchronization Requests", summary.synchronization_requests),
+        ("Successful Synchronizations", summary.successful_synchronizations),
+        ("Retries", summary.retries),
+        ("Duplicate Deliveries", summary.duplicate_deliveries),
+        ("Idempotent Skips", summary.idempotent_skips),
+        ("Rejected Stale Updates", summary.rejected_stale_updates),
+        ("Ordering Skips", summary.ordering_skips),
+        ("Dead Letter Entries", summary.dead_letter_entries),
+    )
+    for label, value in labels:
+        print(f"{label}: {value}")
+    print("\nFinal Projection Revisions\n")
+    for projection in result.final_projections:
+        print(f"{projection.projection.system} {projection.revision.value}")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -854,6 +918,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "dead-letter", help="run the Chapter 22 dead-letter queue scenario"
     )
+    subparsers.add_parser(
+        "laboratory", help="run the Chapter 23 end-to-end operations laboratory"
+    )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -923,6 +990,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return ordering()
     if args.command == "dead-letter":
         return dead_letter()
+    if args.command == "laboratory":
+        return laboratory()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

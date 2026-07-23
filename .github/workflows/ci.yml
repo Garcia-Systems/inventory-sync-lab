@@ -123,6 +123,9 @@ jobs:
       - name: Run Chapter 22 dead letter queue smoke check
         run: docker compose run --rm lab inventory-sim dead-letter
 
+      - name: Run Chapter 23 operations laboratory smoke check
+        run: docker compose run --rm lab inventory-sim laboratory
+
       - name: Verify coverage report
         run: test -s coverage.xml
 

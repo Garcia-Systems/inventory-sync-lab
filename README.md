@@ -32,6 +32,7 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 20: Out-of-Order Delivery — **complete**
 - Chapter 21: Ordering Guarantees — **complete**
 - Chapter 22: Dead Letter Queues — **complete**
+- Chapter 23: End-to-End Operations Laboratory — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -76,6 +77,8 @@ Then read [Idempotent Synchronization](book/19-idempotent-synchronization.md).
 Continue with [Out-of-Order Delivery](book/20-out-of-order-delivery.md).
 Then read [Ordering Guarantees](book/21-ordering-guarantees.md).
 Continue with [Dead Letter Queues](book/22-dead-letter-queues.md).
+Conclude Volume I with the [End-to-End Operations
+Laboratory](book/23-end-to-end-operations-laboratory.md).
 
 ## Quick start
 
@@ -109,6 +112,7 @@ docker compose run --rm lab inventory-sim idempotency
 docker compose run --rm lab inventory-sim out-of-order
 docker compose run --rm lab inventory-sim ordering
 docker compose run --rm lab inventory-sim dead-letter
+docker compose run --rm lab inventory-sim laboratory
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

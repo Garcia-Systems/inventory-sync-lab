@@ -36,6 +36,12 @@ from inventory_sim.freshness import (
     run_freshness_scenario,
 )
 from inventory_sim.inventory import InventoryState
+from inventory_sim.laboratory import (
+    LaboratoryOperation,
+    LaboratoryResult,
+    OperationalSummary,
+    run_laboratory_scenario,
+)
 from inventory_sim.ledger import (
     Adjustment,
     InventoryEvent,
@@ -128,6 +134,9 @@ __all__ = [
     "InventoryLedger",
     "InventoryProjection",
     "InventoryRevision",
+    "LaboratoryOperation",
+    "LaboratoryResult",
+    "OperationalSummary",
     "ProjectionInspection",
     "ProjectionRegistry",
     "QueueEnqueueExecution",
@@ -184,5 +193,6 @@ __all__ = [
     "run_stale_rejection_scenario",
     "run_freshness_scenario",
     "run_inventory_revisions_scenario",
+    "run_laboratory_scenario",
     "synchronize_directly",
 ]
