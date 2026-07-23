@@ -11,6 +11,7 @@ from inventory_sim.authority import (
     InventoryCopy,
     compare_inventory,
 )
+from inventory_sim.capacity import run_worker_capacity_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
@@ -42,15 +43,17 @@ def demo() -> int:
     print("Chapter 5 adds a deterministic virtual timeline of generic actions.")
     print("Chapter 6 adds direct synchronization at a deterministic simulated time.")
     print("Chapter 7 adds queued synchronization and FIFO request processing.")
-    print("One deterministic worker processes one request per scheduled action.")
-    print("Failures, retries, and multiple workers are not implemented.")
-    print("Variable latency is not modeled.")
-    print("Chapter 8 introduces worker capacity and service time.")
+    print("Chapter 8 adds fixed processing time, worker capacity, and request waits.")
+    print("One worker is BUSY while servicing one request and IDLE otherwise.")
+    print("Queue depth grows when arrivals outpace completion capacity.")
+    print("Multiple workers, failures, and retries are not implemented.")
+    print("Random latency is not implemented.")
+    print("Chapter 9 introduces multiple workers.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
-        "`inventory-sim sync-queue` to explore."
+        "`inventory-sim sync-queue`, or `inventory-sim worker-capacity` to explore."
     )
     return 0
 
@@ -284,6 +287,90 @@ def sync_queue() -> int:
     return 0
 
 
+def worker_capacity() -> int:
+    """Run the canonical Chapter 8 worker-capacity scenario."""
+    result = run_worker_capacity_scenario()
+    authority = result.authoritative_state
+    print("Workers and Capacity\n")
+    print("Authoritative state")
+    print(f"On hand:   {authority.on_hand}")
+    print(f"Reserved:  {authority.reserved}")
+    print(f"Available: {authority.available}\n")
+    print("Worker")
+    print(f"Service time: {result.service_time} ticks")
+    print("Capacity: one request at a time\n")
+    print("Request arrivals")
+    for arrival in result.arrivals:
+        print(f"Time {arrival.time} — {arrival.system}")
+    print("\nProcessing timeline")
+    arrivals = {arrival.time: arrival for arrival in result.arrivals}
+    starts = {start.started_at: start for start in result.processing_starts}
+    completions = {
+        completion.completed_at: completion for completion in result.completions
+    }
+    for time in (1, 2, 3, 4, 7, 10):
+        print(f"\nTime {time}")
+        if time in arrivals:
+            arrival = arrivals[time]
+            print(f"  {arrival.system} arrived")
+        if time in completions:
+            completion = completions[time]
+            print(f"  {completion.system} completed")
+            print(f"  {completion.system} now MATCHES")
+        if time in starts:
+            start = starts[time]
+            immediate = " immediately" if start.wait_time == 0 else ""
+            print(f"  {start.system} started{immediate}")
+            print(f"  completion scheduled for time {start.completes_at}")
+            print(f"  queue depth: {start.queue_depth_after}")
+        elif time in arrivals:
+            arrival = arrivals[time]
+            active = next(
+                inspection.current_system
+                for inspection in result.inspections
+                if inspection.time == 3
+            )
+            print(f"  worker busy with {active}")
+            print(f"  queue depth: {arrival.queue_depth}")
+        if time == 10:
+            print("  worker became IDLE")
+            print("  queue depth: 0")
+    print("\nRequest timing")
+    for completion in result.completions:
+        print(f"\n{completion.system}")
+        print(f"  Arrival: {completion.arrived_at}")
+        print(f"  Start: {completion.started_at}")
+        print(f"  Completion: {completion.completed_at}")
+        print(f"  Wait: {completion.wait_time}")
+        print(f"  Service: {completion.service_time}")
+        print(f"  Total: {completion.total_time}")
+    print("\nInspections")
+    for inspection in result.inspections:
+        detail = inspection.worker_status
+        if inspection.current_system is not None:
+            detail += (
+                f" with {inspection.current_system} until time "
+                f"{inspection.current_completion_time}"
+            )
+        print(f"\nInspection at time {inspection.time}")
+        print(f"  Worker: {detail}")
+        print(f"  Queue depth: {inspection.queue_depth}")
+        for projection in inspection.projections:
+            print(
+                f"  {projection.system}: {'MATCH' if projection.matches else 'STALE'}"
+            )
+    print(f"\nFinal worker state: {result.final_worker_status}")
+    print(f"Final queue depth: {result.final_queue_depth}")
+    print(f"Final simulated time: {result.final_time}\n")
+    print("Requests arrived faster than one worker could complete them.")
+    print("Waiting time increased even though service time remained fixed.")
+    print(
+        "No real waiting, parallel workers, failures, retries, or random timing "
+        "were used."
+    )
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -315,6 +402,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "sync-queue", help="run the Chapter 7 queued synchronization scenario"
+    )
+    subparsers.add_parser(
+        "worker-capacity", help="run the Chapter 8 worker-capacity scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -355,6 +445,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return sync_direct()
     if args.command == "sync-queue":
         return sync_queue()
+    if args.command == "worker-capacity":
+        return worker_capacity()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
