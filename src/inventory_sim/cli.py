@@ -12,6 +12,7 @@ from inventory_sim.authority import (
     compare_inventory,
 )
 from inventory_sim.capacity import run_worker_capacity_scenario
+from inventory_sim.dead_letter import run_dead_letter_scenario
 from inventory_sim.duplicate_delivery import run_duplicate_delivery_scenario
 from inventory_sim.fanout import run_fanout_scenario
 from inventory_sim.freshness import run_freshness_scenario
@@ -78,6 +79,7 @@ def demo() -> int:
     print("Chapter 19 makes repeated processing idempotent.")
     print("Chapter 20 demonstrates intentional out-of-order delivery.")
     print("Chapter 21 prevents projections from moving to older revisions.")
+    print("Chapter 22 isolates terminal failures in a dead letter queue.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -89,7 +91,7 @@ def demo() -> int:
         "`inventory-sim multiple-projections`, `inventory-sim fanout`, or "
         "`inventory-sim retries`, `inventory-sim duplicate-delivery`, or "
         "`inventory-sim idempotency`, `inventory-sim out-of-order`, or "
-        "`inventory-sim ordering` "
+        "`inventory-sim ordering`, `inventory-sim dead-letter` "
         "to explore."
     )
     return 0
@@ -749,6 +751,36 @@ def ordering() -> int:
     return 0
 
 
+def dead_letter() -> int:
+    """Run the canonical Chapter 22 terminal-failure scenario."""
+    result = run_dead_letter_scenario()
+    print("Synchronization Summary\n")
+    by_system: dict[str, list] = {}
+    for completion in result.completions:
+        by_system.setdefault(completion.attempt.request.system, []).append(completion)
+
+    print("Storefront")
+    print("Success\n")
+    print("Warehouse")
+    print("Succeeded after retry\n")
+    print("Reporting")
+    for completion in by_system["Reporting"]:
+        print(f"Retry {completion.attempt.number} failed")
+    print("\nMoved to Dead Letter Queue\n")
+    print("Dead Letter Queue\n")
+    for entry in result.dead_letters:
+        print(entry.request.system)
+        print(f"Revision {entry.revision.value}")
+        print("Reason:")
+        print(f"{entry.reason}\n")
+    print("Operational Summary\n")
+    print(f"Successful requests: {len(result.successful_requests)}")
+    print(f"Retries performed: {result.retry_count}")
+    print(f"Dead-letter entries: {len(result.dead_letters)}")
+    print("Terminal work is isolated; other synchronization continues.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -819,6 +851,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "ordering", help="run the Chapter 21 monotonic-ordering scenario"
     )
+    subparsers.add_parser(
+        "dead-letter", help="run the Chapter 22 dead-letter queue scenario"
+    )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -886,6 +921,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return out_of_order()
     if args.command == "ordering":
         return ordering()
+    if args.command == "dead-letter":
+        return dead_letter()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

@@ -120,6 +120,9 @@ jobs:
       - name: Run Chapter 21 ordering guarantees smoke check
         run: docker compose run --rm lab inventory-sim ordering
 
+      - name: Run Chapter 22 dead letter queue smoke check
+        run: docker compose run --rm lab inventory-sim dead-letter
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
