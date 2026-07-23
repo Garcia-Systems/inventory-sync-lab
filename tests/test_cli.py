@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 import sys
 
@@ -783,3 +784,29 @@ def test_package_module_supports_dead_letter_command() -> None:
     )
     assert completed.returncode == 0
     assert "Terminal work is isolated" in completed.stdout
+
+
+def test_parser_registers_all_published_commands() -> None:
+    from inventory_sim.cli.main import COMMANDS, build_parser
+
+    parser = build_parser()
+    command_action = next(
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    expected = {command.name for command in COMMANDS} | {"inventory", "authority"}
+    assert command_action.choices is not None
+    assert set(command_action.choices) == expected
+
+
+def test_top_level_help_keeps_published_interface(capsys) -> None:  # type: ignore[no-untyped-def]
+    with pytest.raises(SystemExit) as exit_info:
+        main(["--help"])
+
+    assert exit_info.value.code == 0
+    output = capsys.readouterr().out
+    assert output.startswith("usage: inventory-sim [-h]")
+    assert "Commands for the Inventory Synchronization Laboratory." in output
+    for command in ("ledger", "multiple-workers", "retries", "laboratory"):
+        assert command in output
