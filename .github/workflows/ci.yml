@@ -81,6 +81,9 @@ jobs:
       - name: Run Chapter 8 worker capacity smoke check
         run: docker compose run --rm lab inventory-sim worker-capacity
 
+      - name: Run Chapter 9 multiple workers smoke check
+        run: docker compose run --rm lab inventory-sim multiple-workers
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
