@@ -45,7 +45,8 @@ Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
 [Queues](book/07-queues.md), and then [Workers and
 Capacity](book/08-workers-and-capacity.md), followed by [Multiple
 Workers](book/09-multiple-workers.md), and then [Stale
-Snapshots](book/10-stale-snapshots.md).
+Snapshots](book/10-stale-snapshots.md), followed by [Measuring
+Freshness](book/11-measuring-freshness.md).
 
 ## Quick start
 
@@ -67,6 +68,7 @@ docker compose run --rm lab inventory-sim sync-queue
 docker compose run --rm lab inventory-sim worker-capacity
 docker compose run --rm lab inventory-sim multiple-workers
 docker compose run --rm lab inventory-sim stale-snapshots
+docker compose run --rm lab inventory-sim freshness
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

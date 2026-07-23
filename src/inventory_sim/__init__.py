@@ -17,6 +17,12 @@ from inventory_sim.capacity import (
     WorkerState,
     run_worker_capacity_scenario,
 )
+from inventory_sim.freshness import (
+    FreshnessObservation,
+    FreshnessResult,
+    measure_freshness,
+    run_freshness_scenario,
+)
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import (
     Adjustment,
@@ -61,7 +67,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 
 __all__ = [
     "Adjustment",
@@ -71,6 +77,8 @@ __all__ = [
     "DirectSynchronizationExecution",
     "DirectSynchronizationResult",
     "InventoryComparison",
+    "FreshnessObservation",
+    "FreshnessResult",
     "InventoryCopy",
     "InventoryState",
     "InventoryEvent",
@@ -107,10 +115,12 @@ __all__ = [
     "MultipleWorkersResult",
     "__version__",
     "compare_inventory",
+    "measure_freshness",
     "run_direct_synchronization_scenario",
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",
     "run_stale_snapshots_scenario",
+    "run_freshness_scenario",
     "synchronize_directly",
 ]
