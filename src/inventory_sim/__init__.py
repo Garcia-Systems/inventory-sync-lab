@@ -34,6 +34,11 @@ from inventory_sim.ledger import (
     Reserve,
     Ship,
 )
+from inventory_sim.multiple_projections import (
+    MultipleProjectionsResult,
+    RevisionedProjection,
+    run_multiple_projections_scenario,
+)
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import (
     ProjectionRegistry,
@@ -87,7 +92,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.14.0"
+__version__ = "0.15.0"
 
 __all__ = [
     "Adjustment",
@@ -141,6 +146,8 @@ __all__ = [
     "WorkerPool",
     "MultipleWorkersInspection",
     "MultipleWorkersResult",
+    "MultipleProjectionsResult",
+    "RevisionedProjection",
     "__version__",
     "compare_inventory",
     "detect_stale_request",
@@ -151,6 +158,7 @@ __all__ = [
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",
+    "run_multiple_projections_scenario",
     "run_stale_snapshots_scenario",
     "run_stale_detection_scenario",
     "run_stale_rejection_scenario",
