@@ -18,6 +18,7 @@ from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
 from inventory_sim.synchronization import run_direct_synchronization_scenario
+from inventory_sim.worker_pool import run_multiple_workers_scenario
 
 
 def doctor() -> int:
@@ -46,14 +47,17 @@ def demo() -> int:
     print("Chapter 8 adds fixed processing time, worker capacity, and request waits.")
     print("One worker is BUSY while servicing one request and IDLE otherwise.")
     print("Queue depth grows when arrivals outpace completion capacity.")
-    print("Multiple workers, failures, and retries are not implemented.")
-    print("Random latency is not implemented.")
-    print("Chapter 9 introduces multiple workers.")
+    print("Chapter 9 adds a fixed two-worker pool and deterministic assignment.")
+    print("Multiple requests can now be in progress in simulated time.")
+    print("No operating-system concurrency, worker failures, or retries are used.")
+    print("Service time remains fixed. Random latency is not implemented.")
+    print("Chapter 10 introduces changing authority while work is waiting.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
-        "`inventory-sim sync-queue`, or `inventory-sim worker-capacity` to explore."
+        "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
+        "`inventory-sim multiple-workers` to explore."
     )
     return 0
 
@@ -371,6 +375,65 @@ def worker_capacity() -> int:
     return 0
 
 
+def multiple_workers() -> int:
+    """Run the canonical Chapter 9 two-worker scenario."""
+    result = run_multiple_workers_scenario()
+    authority = result.authoritative_state
+    print("Multiple Workers\n")
+    print("Authoritative state")
+    print(f"On hand:   {authority.on_hand}")
+    print(f"Reserved:  {authority.reserved}")
+    print(f"Available: {authority.available}\n")
+    print("Worker pool")
+    print(f"Workers: {result.worker_count}")
+    print(f"Service time: {result.service_time} ticks")
+    print("Capacity: two requests at a time\n")
+    print("Request arrivals")
+    for arrival in result.arrivals:
+        print(f"Time {arrival.time} — {arrival.system}")
+    print("\nRequest timing")
+    for completion in result.completions:
+        print(f"\n{completion.system}")
+        print(f"  Worker: {completion.worker_name}")
+        print(f"  Arrival: {completion.arrived_at}")
+        print(f"  Start: {completion.started_at}")
+        print(f"  Completion: {completion.completed_at}")
+        print(f"  Wait: {completion.wait_time}")
+        print(f"  Service: {completion.service_time}")
+        print(f"  Total: {completion.total_time}")
+    print("\nInspections")
+    for inspection in result.inspections:
+        print(f"\nInspection at time {inspection.time}")
+        for worker in inspection.workers:
+            detail = worker.status
+            if worker.current_system is not None:
+                detail += (
+                    f" with {worker.current_system} until time {worker.completion_time}"
+                )
+            print(f"  {worker.name}: {detail}")
+        print(f"  Busy workers: {inspection.busy_worker_count}")
+        print(f"  Queue depth: {inspection.queue_depth}")
+        for projection in inspection.projections:
+            print(
+                f"  {projection.system}: {'MATCH' if projection.matches else 'STALE'}"
+            )
+    print(f"\nMaximum queue depth: {result.maximum_queue_depth}")
+    print(f"Average wait time: {result.average_wait_time:.2f} ticks")
+    print(f"Final queue depth: {result.final_queue_depth}")
+    print(f"Final simulated time: {result.final_time}\n")
+    print(
+        "Two workers processed different requests during the same simulated intervals."
+    )
+    print(
+        "FIFO requests and lowest-numbered idle workers made assignment deterministic."
+    )
+    print("Projections changed only when processing completed.")
+    print(
+        "No threads, real parallelism, failures, retries, or random timing were used."
+    )
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -405,6 +468,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "worker-capacity", help="run the Chapter 8 worker-capacity scenario"
+    )
+    subparsers.add_parser(
+        "multiple-workers", help="run the Chapter 9 two-worker scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -447,6 +513,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return sync_queue()
     if args.command == "worker-capacity":
         return worker_capacity()
+    if args.command == "multiple-workers":
+        return multiple_workers()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,
