@@ -87,6 +87,12 @@ jobs:
       - name: Run Chapter 10 stale snapshots smoke check
         run: docker compose run --rm lab inventory-sim stale-snapshots
 
+      - name: Run Chapter 11 freshness smoke check
+        run: docker compose run --rm lab inventory-sim freshness
+
+      - name: Run Chapter 12 inventory revisions smoke check
+        run: docker compose run --rm lab inventory-sim revisions
+
       - name: Verify coverage report
         run: test -s coverage.xml
 

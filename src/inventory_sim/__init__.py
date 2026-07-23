@@ -46,6 +46,13 @@ from inventory_sim.queues import (
     WorkerExecution,
     run_queue_synchronization_scenario,
 )
+from inventory_sim.revisions import (
+    InventoryRevision,
+    RevisionedInventoryState,
+    RevisionScenarioResult,
+    observe_ledger_revisions,
+    run_inventory_revisions_scenario,
+)
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
 from inventory_sim.stale_snapshots import (
     StaleSnapshotInspection,
@@ -67,7 +74,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 
 __all__ = [
     "Adjustment",
@@ -85,6 +92,7 @@ __all__ = [
     "InventoryEventType",
     "InventoryLedger",
     "InventoryProjection",
+    "InventoryRevision",
     "ProjectionInspection",
     "ProjectionRegistry",
     "QueueEnqueueExecution",
@@ -94,6 +102,8 @@ __all__ = [
     "EventScheduler",
     "Receive",
     "RequestArrival",
+    "RevisionedInventoryState",
+    "RevisionScenarioResult",
     "ReleaseReservation",
     "Reserve",
     "Ship",
@@ -116,11 +126,13 @@ __all__ = [
     "__version__",
     "compare_inventory",
     "measure_freshness",
+    "observe_ledger_revisions",
     "run_direct_synchronization_scenario",
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",
     "run_stale_snapshots_scenario",
     "run_freshness_scenario",
+    "run_inventory_revisions_scenario",
     "synchronize_directly",
 ]

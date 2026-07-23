@@ -17,6 +17,7 @@ from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
+from inventory_sim.revisions import run_inventory_revisions_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
 from inventory_sim.stale_snapshots import run_stale_snapshots_scenario
 from inventory_sim.synchronization import run_direct_synchronization_scenario
@@ -56,12 +57,16 @@ def demo() -> int:
     print("Chapter 10 introduces changing authority while work is waiting.")
     print("Chapter 11 measures queue wait, service time, and snapshot age.")
     print(
+        "Chapter 12 adds revisions that order inventory states independently "
+        "of quantity."
+    )
+    print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
-        "`inventory-sim freshness` "
+        "`inventory-sim freshness`, or `inventory-sim revisions` "
         "to explore."
     )
     return 0
@@ -497,6 +502,26 @@ def freshness() -> int:
     return 0
 
 
+def revisions() -> int:
+    """Run the canonical Chapter 12 inventory-revision scenario."""
+    result = run_inventory_revisions_scenario()
+    print("Inventory Revisions\n")
+    print("Revision    Available")
+    print("---------------------")
+    for observation in result.observations:
+        print(f"{observation.revision.value:<12}{observation.state.available}")
+    print("\nRevision 3 is newer than Revision 1 even though both report")
+    print("the same available quantity (10).")
+    print(
+        "Synchronization requests still copy their snapshots without revision policy."
+    )
+    print(
+        "Revisions provide ordering information only; none is classified "
+        "stale or fresh."
+    )
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -540,6 +565,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "freshness", help="run the Chapter 11 freshness-measurement scenario"
+    )
+    subparsers.add_parser(
+        "revisions", help="run the Chapter 12 inventory-revision scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -588,6 +616,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return stale_snapshots()
     if args.command == "freshness":
         return freshness()
+    if args.command == "revisions":
+        return revisions()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

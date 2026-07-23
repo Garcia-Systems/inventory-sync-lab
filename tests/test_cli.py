@@ -126,6 +126,28 @@ def test_package_module_supports_freshness_command() -> None:
     assert "Time 9 — Request C completes" in completed.stdout
 
 
+def test_revisions_command_orders_repeated_quantities(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["revisions"]) == 0
+    output = capsys.readouterr().out
+    assert "Revision    Available" in output
+    assert "1           10" in output
+    assert "2           7" in output
+    assert "3           10" in output
+    assert "Revision 3 is newer than Revision 1" in output
+    assert "ordering information only" in output
+
+
+def test_package_module_supports_revisions_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "revisions"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Synchronization requests still copy their snapshots" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out
