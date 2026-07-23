@@ -102,6 +102,9 @@ jobs:
       - name: Run Chapter 15 multiple projections smoke check
         run: docker compose run --rm lab inventory-sim multiple-projections
 
+      - name: Run Chapter 16 fan-out synchronization smoke check
+        run: docker compose run --rm lab inventory-sim fanout
+
       - name: Verify coverage report
         run: test -s coverage.xml
 

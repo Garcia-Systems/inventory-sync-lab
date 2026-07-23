@@ -25,6 +25,7 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 13: Detecting Stale Synchronizations — **complete**
 - Chapter 14: Rejecting Stale Synchronizations — **complete**
 - Chapter 15: Multiple Projections — **complete**
+- Chapter 16: Fan-Out Synchronization — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -55,7 +56,8 @@ Freshness](book/11-measuring-freshness.md), and then [Inventory
 Revisions](book/12-inventory-revisions.md), followed by [Detecting Stale
 Synchronizations](book/13-detecting-stale-synchronizations.md), and then
 [Rejecting Stale Synchronizations](book/14-rejecting-stale-synchronizations.md).
-Continue with [Multiple Projections](book/15-multiple-projections.md).
+Continue with [Multiple Projections](book/15-multiple-projections.md), followed by
+[Fan-Out Synchronization](book/16-fan-out-synchronization.md).
 
 ## Quick start
 
@@ -82,6 +84,7 @@ docker compose run --rm lab inventory-sim revisions
 docker compose run --rm lab inventory-sim detect-stale
 docker compose run --rm lab inventory-sim reject-stale
 docker compose run --rm lab inventory-sim multiple-projections
+docker compose run --rm lab inventory-sim fanout
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
