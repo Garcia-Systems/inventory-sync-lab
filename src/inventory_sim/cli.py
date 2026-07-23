@@ -15,6 +15,7 @@ from inventory_sim.capacity import run_worker_capacity_scenario
 from inventory_sim.duplicate_delivery import run_duplicate_delivery_scenario
 from inventory_sim.fanout import run_fanout_scenario
 from inventory_sim.freshness import run_freshness_scenario
+from inventory_sim.idempotency import run_idempotency_scenario
 from inventory_sim.inventory import InventoryState
 from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.multiple_projections import run_multiple_projections_scenario
@@ -72,6 +73,7 @@ def demo() -> int:
     print("Chapter 16 fans one authority revision out into three requests.")
     print("Chapter 17 retries a failed delivery with the same immutable request.")
     print("Chapter 18 intentionally delivers the same request twice.")
+    print("Chapter 19 makes repeated processing idempotent.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -81,7 +83,8 @@ def demo() -> int:
         "`inventory-sim freshness`, `inventory-sim revisions`, or "
         "`inventory-sim detect-stale`, `inventory-sim reject-stale`, or "
         "`inventory-sim multiple-projections`, `inventory-sim fanout`, or "
-        "`inventory-sim retries`, `inventory-sim duplicate-delivery` "
+        "`inventory-sim retries`, `inventory-sim duplicate-delivery`, or "
+        "`inventory-sim idempotency` "
         "to explore."
     )
     return 0
@@ -676,6 +679,25 @@ def duplicate_delivery() -> int:
     return 0
 
 
+def idempotency() -> int:
+    """Run the canonical Chapter 19 idempotent-synchronization scenario."""
+    result = run_idempotency_scenario()
+    print(f"Authority Revision {result.authority.revision.value}\n")
+    print(f"Synchronization Request {result.request.request_id}")
+    for delivery in result.deliveries:
+        print(f"\nDelivery {delivery.number}\n")
+        print("Result:")
+        if delivery.projection_updated:
+            print("Projection updated.")
+        else:
+            print("Already applied.\n")
+            print("Projection unchanged.")
+    print("\nSummary\n")
+    print(f"Deliveries: {len(result.deliveries)}\n")
+    print(f"Projection updates: {result.projection_update_count}")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -736,6 +758,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("retries", help="run the Chapter 17 retry-policy scenario")
     subparsers.add_parser(
         "duplicate-delivery", help="run the Chapter 18 duplicate-delivery scenario"
+    )
+    subparsers.add_parser(
+        "idempotency", help="run the Chapter 19 idempotent synchronization scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -798,6 +823,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return retries()
     if args.command == "duplicate-delivery":
         return duplicate_delivery()
+    if args.command == "idempotency":
+        return idempotency()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

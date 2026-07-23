@@ -665,3 +665,32 @@ def test_package_module_supports_duplicate_delivery_command() -> None:
     )
     assert completed.returncode == 0
     assert "Request deliveries: 2" in completed.stdout
+
+
+def test_idempotency_command_distinguishes_delivery_from_effect(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["idempotency"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Authority Revision 12",
+        "Synchronization Request 57",
+        "Delivery 1",
+        "Projection updated.",
+        "Delivery 2",
+        "Delivery 3",
+        "Already applied.",
+        "Projection unchanged.",
+        "Deliveries: 3",
+        "Projection updates: 1",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_idempotency_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "idempotency"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert completed.stdout.count("Already applied.") == 2

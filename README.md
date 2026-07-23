@@ -27,6 +27,8 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 15: Multiple Projections — **complete**
 - Chapter 16: Fan-Out Synchronization — **complete**
 - Chapter 17: Retry Policies — **complete**
+- Chapter 18: Duplicate Delivery — **complete**
+- Chapter 19: Idempotent Synchronization — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -40,7 +42,8 @@ to be in progress during the same simulated interval. FIFO requests and numbered
 workers make assignment deterministic, while service time remains fixed.
 Chapter 10 demonstrates that authority can change while an earlier captured
 snapshot waits, leaving a successful projection update already obsolete. Chapter
-17 adds one deterministic delivery failure and retry; real threads, random
+17 adds one deterministic delivery failure and retry, Chapter 18 exposes duplicate
+delivery, and Chapter 19 makes its effects idempotent; real threads, random
 failures, and random service times are not implemented. This is not production
 synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
@@ -62,6 +65,7 @@ Continue with [Multiple Projections](book/15-multiple-projections.md), followed 
 [Fan-Out Synchronization](book/16-fan-out-synchronization.md), and then [Retry
 Policies](book/17-retry-policies.md).
 Continue with [Duplicate Delivery](book/18-duplicate-delivery.md).
+Then read [Idempotent Synchronization](book/19-idempotent-synchronization.md).
 
 ## Quick start
 
@@ -91,6 +95,7 @@ docker compose run --rm lab inventory-sim multiple-projections
 docker compose run --rm lab inventory-sim fanout
 docker compose run --rm lab inventory-sim retries
 docker compose run --rm lab inventory-sim duplicate-delivery
+docker compose run --rm lab inventory-sim idempotency
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

@@ -16,11 +16,16 @@ class SynchronizationRequest:
 
     system: str
     authoritative_state: InventoryState
+    request_id: int | None = None
 
     def __post_init__(self) -> None:
         # InventoryProjection owns the existing system-name validation rules.
         validated = InventoryProjection(self.system, self.authoritative_state)
         object.__setattr__(self, "system", validated.system)
+        if self.request_id is not None and (
+            type(self.request_id) is not int or self.request_id < 1
+        ):
+            raise ValueError("request id must be a positive integer")
 
 
 class SynchronizationQueue:
