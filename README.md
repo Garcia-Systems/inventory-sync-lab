@@ -31,6 +31,7 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 19: Idempotent Synchronization — **complete**
 - Chapter 20: Out-of-Order Delivery — **complete**
 - Chapter 21: Ordering Guarantees — **complete**
+- Chapter 22: Dead Letter Queues — **complete**
 
 Stale work is now rejected before it can overwrite a current projection.
 
@@ -49,8 +50,9 @@ delivery, and Chapter 19 makes its effects idempotent; real threads, random
 failures, and random service times are not implemented. Chapter 20 shows that
 distinct requests processed exactly once can still produce an incorrect result
 when delivered out of order. Chapter 21 adds a monotonic revision comparison so
-older requests cannot move a projection backward. This is not production
-synchronization. Start with
+older requests cannot move a projection backward. Chapter 22 bounds retries and
+isolates terminal failures without stopping healthy
+work. This is not production synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
 [What Is Inventory?](book/01-what-is-inventory.md), and then read
 [The Authoritative Source of Truth](book/02-authoritative-source-of-truth.md).
@@ -73,6 +75,7 @@ Continue with [Duplicate Delivery](book/18-duplicate-delivery.md).
 Then read [Idempotent Synchronization](book/19-idempotent-synchronization.md).
 Continue with [Out-of-Order Delivery](book/20-out-of-order-delivery.md).
 Then read [Ordering Guarantees](book/21-ordering-guarantees.md).
+Continue with [Dead Letter Queues](book/22-dead-letter-queues.md).
 
 ## Quick start
 
@@ -105,6 +108,7 @@ docker compose run --rm lab inventory-sim duplicate-delivery
 docker compose run --rm lab inventory-sim idempotency
 docker compose run --rm lab inventory-sim out-of-order
 docker compose run --rm lab inventory-sim ordering
+docker compose run --rm lab inventory-sim dead-letter
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

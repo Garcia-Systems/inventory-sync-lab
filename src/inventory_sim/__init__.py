@@ -17,6 +17,13 @@ from inventory_sim.capacity import (
     WorkerState,
     run_worker_capacity_scenario,
 )
+from inventory_sim.dead_letter import (
+    DeadLetterEntry,
+    DeadLetterQueue,
+    DeadLetterRetryPolicy,
+    DeadLetterScenarioResult,
+    run_dead_letter_scenario,
+)
 from inventory_sim.duplicate_delivery import (
     DuplicateDeliveryResult,
     RequestDelivery,
@@ -97,7 +104,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.15.0"
+__version__ = "0.16.0"
 
 __all__ = [
     "Adjustment",
@@ -106,6 +113,10 @@ __all__ = [
     "CapacityScenarioInspection",
     "DirectSynchronizationExecution",
     "DirectSynchronizationResult",
+    "DeadLetterEntry",
+    "DeadLetterQueue",
+    "DeadLetterRetryPolicy",
+    "DeadLetterScenarioResult",
     "DuplicateDeliveryResult",
     "InventoryComparison",
     "FreshnessObservation",
@@ -163,6 +174,7 @@ __all__ = [
     "observe_ledger_revisions",
     "run_direct_synchronization_scenario",
     "run_duplicate_delivery_scenario",
+    "run_dead_letter_scenario",
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",

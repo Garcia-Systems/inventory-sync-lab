@@ -755,3 +755,31 @@ def test_package_module_supports_ordering_command() -> None:
     )
     assert completed.returncode == 0
     assert "Final projection revision: 14" in completed.stdout
+
+
+def test_dead_letter_command_reports_isolation_and_summary(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["dead-letter"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Synchronization Summary",
+        "Storefront\nSuccess",
+        "Warehouse\nSucceeded after retry",
+        "Reporting\nRetry 1 failed\nRetry 2 failed\nRetry 3 failed",
+        "Moved to Dead Letter Queue",
+        "Reporting\nRevision 15\nReason:\nMaximum retry attempts exceeded",
+        "Successful requests: 2",
+        "Retries performed: 3",
+        "Dead-letter entries: 1",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_dead_letter_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "dead-letter"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Terminal work is isolated" in completed.stdout
