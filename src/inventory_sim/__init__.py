@@ -29,11 +29,18 @@ from inventory_sim.duplicate_delivery import (
     RequestDelivery,
     run_duplicate_delivery_scenario,
 )
+from inventory_sim.fanout import FanOutGenerator, FanOutResult, run_fanout_scenario
 from inventory_sim.freshness import (
     FreshnessObservation,
     FreshnessResult,
     measure_freshness,
     run_freshness_scenario,
+)
+from inventory_sim.idempotency import (
+    AppliedRequestRegistry,
+    IdempotencyResult,
+    IdempotentDelivery,
+    run_idempotency_scenario,
 )
 from inventory_sim.inventory import InventoryState
 from inventory_sim.laboratory import (
@@ -54,8 +61,18 @@ from inventory_sim.ledger import (
 )
 from inventory_sim.multiple_projections import (
     MultipleProjectionsResult,
-    RevisionedProjection,
     run_multiple_projections_scenario,
+)
+from inventory_sim.ordering import (
+    OrderedDelivery,
+    OrderingResult,
+    revision_advances_projection,
+    run_ordering_scenario,
+)
+from inventory_sim.out_of_order import (
+    OutOfOrderDelivery,
+    OutOfOrderResult,
+    run_out_of_order_scenario,
 )
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import (
@@ -69,9 +86,17 @@ from inventory_sim.queues import (
     WorkerExecution,
     run_queue_synchronization_scenario,
 )
+from inventory_sim.retries import (
+    AttemptCompletion,
+    RetryPolicy,
+    RetryScenarioResult,
+    SynchronizationAttempt,
+    run_retry_scenario,
+)
 from inventory_sim.revisions import (
     InventoryRevision,
     RevisionedInventoryState,
+    RevisionedProjection,
     RevisionScenarioResult,
     observe_ledger_revisions,
     run_inventory_revisions_scenario,
@@ -114,6 +139,8 @@ __version__ = "0.16.0"
 
 __all__ = [
     "Adjustment",
+    "AppliedRequestRegistry",
+    "AttemptCompletion",
     "AuthoritativeInventoryRecord",
     "CapacityQueue",
     "CapacityScenarioInspection",
@@ -124,6 +151,8 @@ __all__ = [
     "DeadLetterRetryPolicy",
     "DeadLetterScenarioResult",
     "DuplicateDeliveryResult",
+    "FanOutGenerator",
+    "FanOutResult",
     "InventoryComparison",
     "FreshnessObservation",
     "FreshnessResult",
@@ -134,9 +163,15 @@ __all__ = [
     "InventoryLedger",
     "InventoryProjection",
     "InventoryRevision",
+    "IdempotencyResult",
+    "IdempotentDelivery",
     "LaboratoryOperation",
     "LaboratoryResult",
     "OperationalSummary",
+    "OrderedDelivery",
+    "OrderingResult",
+    "OutOfOrderDelivery",
+    "OutOfOrderResult",
     "ProjectionInspection",
     "ProjectionRegistry",
     "QueueEnqueueExecution",
@@ -149,11 +184,14 @@ __all__ = [
     "RequestDelivery",
     "RevisionedInventoryState",
     "RevisionScenarioResult",
+    "RetryPolicy",
+    "RetryScenarioResult",
     "ReleaseReservation",
     "Reserve",
     "Ship",
     "SynchronizationQueue",
     "SynchronizationRequest",
+    "SynchronizationAttempt",
     "SynchronizationWorker",
     "SynchronizationWorkItem",
     "StaleSnapshotInspection",
@@ -192,7 +230,13 @@ __all__ = [
     "run_stale_detection_scenario",
     "run_stale_rejection_scenario",
     "run_freshness_scenario",
+    "run_fanout_scenario",
+    "run_idempotency_scenario",
     "run_inventory_revisions_scenario",
     "run_laboratory_scenario",
+    "run_ordering_scenario",
+    "run_out_of_order_scenario",
+    "run_retry_scenario",
+    "revision_advances_projection",
     "synchronize_directly",
 ]

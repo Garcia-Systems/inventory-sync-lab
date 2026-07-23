@@ -129,6 +129,25 @@ these checks through Docker on pushes and pull requests. Codecov requires the
 repository owner to add one `CODECOV_TOKEN` Actions secret and may show no result
 until the first successful CI upload.
 
+## Supported Python API
+
+The names exported from `inventory_sim` and listed in `inventory_sim.__all__`
+are the supported Volume I Python API. Import core concepts from the package
+root rather than depending on how the chapters are split into modules:
+
+```python
+from inventory_sim import InventoryLedger, InventoryState, Receive
+from inventory_sim import InventoryProjection, RevisionedProjection
+from inventory_sim import EventScheduler, SynchronizationRequest, VirtualClock
+```
+
+The root API includes the core inventory, projection, deterministic scheduling,
+queue, worker-pool, revision, retry, dead-letter, and operations-laboratory
+models and scenario entry points. Internal module paths may change in later
+volumes. Private helpers, the `inventory_sim.cli` implementation, and future
+`experiments` code are not stable public API; use the `inventory-sim` command
+when invoking the CLI.
+
 ## Repository map
 
 - `book/` contains the chapters that drive development.
