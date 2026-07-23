@@ -19,6 +19,7 @@ from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.multiple_projections import run_multiple_projections_scenario
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
+from inventory_sim.retries import run_retry_scenario
 from inventory_sim.revisions import run_inventory_revisions_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
 from inventory_sim.stale_detection import run_stale_detection_scenario
@@ -68,6 +69,7 @@ def demo() -> int:
     print("Chapter 14 rejects stale requests before they update a projection.")
     print("Chapter 15 feeds three independent projections from one authority.")
     print("Chapter 16 fans one authority revision out into three requests.")
+    print("Chapter 17 retries a failed delivery with the same immutable request.")
     print(
         "Run `inventory-sim inventory`, `inventory-sim authority`, or "
         "`inventory-sim ledger`, `inventory-sim projections`, or "
@@ -76,7 +78,8 @@ def demo() -> int:
         "`inventory-sim multiple-workers`, `inventory-sim stale-snapshots`, or "
         "`inventory-sim freshness`, `inventory-sim revisions`, or "
         "`inventory-sim detect-stale`, `inventory-sim reject-stale`, or "
-        "`inventory-sim multiple-projections`, or `inventory-sim fanout` "
+        "`inventory-sim multiple-projections`, `inventory-sim fanout`, or "
+        "`inventory-sim retries` "
         "to explore."
     )
     return 0
@@ -627,6 +630,32 @@ def fanout() -> int:
     return 0
 
 
+def retries() -> int:
+    """Run the canonical Chapter 17 deterministic retry scenario."""
+    result = run_retry_scenario()
+    print("Retry Policies\n")
+    print(f"Revision {result.authority.revision.value}")
+    for request in result.requests:
+        print(f"\n{request.system}")
+        for completion in (
+            item for item in result.completions if item.attempt.request is request
+        ):
+            print(f"Attempt {completion.attempt.number}")
+            print("Success" if completion.succeeded else "Failed")
+            if not completion.succeeded:
+                print("\nRetry scheduled\n")
+    print("\nSummary")
+    print(f"Requests created: {len(result.requests)}")
+    print(f"Attempts performed: {len(result.completions)}")
+    print(f"Retries required: {len(result.retry_attempts)}")
+    print(
+        "Successful synchronizations: "
+        f"{sum(completion.succeeded for completion in result.completions)}"
+    )
+    print("\nRetries improved delivery; they did not add duplicate handling.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -684,6 +713,7 @@ def build_parser() -> argparse.ArgumentParser:
         "multiple-projections", help="run the Chapter 15 multiple-projection scenario"
     )
     subparsers.add_parser("fanout", help="run the Chapter 16 fan-out scenario")
+    subparsers.add_parser("retries", help="run the Chapter 17 retry-policy scenario")
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
     )
@@ -741,6 +771,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return multiple_projections()
     if args.command == "fanout":
         return fanout()
+    if args.command == "retries":
+        return retries()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

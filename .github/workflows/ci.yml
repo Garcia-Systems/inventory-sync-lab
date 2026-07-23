@@ -105,6 +105,9 @@ jobs:
       - name: Run Chapter 16 fan-out synchronization smoke check
         run: docker compose run --rm lab inventory-sim fanout
 
+      - name: Run Chapter 17 retry policies smoke check
+        run: docker compose run --rm lab inventory-sim retries
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
