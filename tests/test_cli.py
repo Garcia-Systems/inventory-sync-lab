@@ -73,6 +73,37 @@ def test_package_module_supports_multiple_workers_command() -> None:
     assert "Average wait time: 0.75 ticks" in completed.stdout
 
 
+def test_stale_snapshots_command_reports_successful_obsolete_copy(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["stale-snapshots"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Stale Snapshots",
+        "Time 1 — Website request created and queued",
+        "Request snapshot available: 7",
+        "Time 2 — Authority changes: Receive 5",
+        "Current authority available: 12",
+        "Time 6 — Worker finishes",
+        "Synchronization succeeded",
+        "Resulting projection available: 7",
+        "matches the request snapshot: MATCH",
+        "differs from current authority: STALE",
+        "Nothing failed",
+        "No freshness validation",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_stale_snapshots_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "stale-snapshots"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "copied snapshot became outdated" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out

@@ -17,6 +17,7 @@ from inventory_sim.ledger import InventoryLedger, Receive, Reserve, Ship
 from inventory_sim.projections import InventoryProjection
 from inventory_sim.queues import run_queue_synchronization_scenario
 from inventory_sim.simulation import EventScheduler, VirtualClock
+from inventory_sim.stale_snapshots import run_stale_snapshots_scenario
 from inventory_sim.synchronization import run_direct_synchronization_scenario
 from inventory_sim.worker_pool import run_multiple_workers_scenario
 
@@ -57,7 +58,8 @@ def demo() -> int:
         "`inventory-sim ledger`, `inventory-sim projections`, or "
         "`inventory-sim timeline`, `inventory-sim sync-direct`, or "
         "`inventory-sim sync-queue`, `inventory-sim worker-capacity`, or "
-        "`inventory-sim multiple-workers` to explore."
+        "`inventory-sim multiple-workers`, or `inventory-sim stale-snapshots` "
+        "to explore."
     )
     return 0
 
@@ -434,6 +436,39 @@ def multiple_workers() -> int:
     return 0
 
 
+def stale_snapshots() -> int:
+    """Run the canonical Chapter 10 stale-snapshot scenario."""
+    result = run_stale_snapshots_scenario()
+    snapshot = result.request.authoritative_state
+    authority = result.current_authority
+    projection = result.inspection.resulting_projection.state
+    website_start = result.processing_starts[1]
+    website_completion = result.completions[1]
+
+    print("Stale Snapshots\n")
+    print("Time 0 — Authority derived from Receive 10 and Reserve 3")
+    print(f"  Available: {result.original_authority.available}")
+    print("  Worker begins an earlier synchronization.\n")
+    print("Time 1 — Website request created and queued")
+    print(f"  Request snapshot available: {snapshot.available}")
+    print("  The request waits while the worker remains busy.\n")
+    print("Time 2 — Authority changes: Receive 5")
+    print(f"  Current authority available: {authority.available}")
+    print(f"  Queued request snapshot remains: {snapshot.available}\n")
+    print(f"Time {website_start.started_at} — Worker starts the queued request")
+    print(f"  Completion scheduled for time {website_start.completes_at}.\n")
+    print(f"Time {website_completion.completed_at} — Worker finishes")
+    print("  Synchronization succeeded; projection updated from the request.")
+    print(f"  Request snapshot available: {snapshot.available}")
+    print(f"  Resulting projection available: {projection.available}")
+    print(f"  Current authority available: {authority.available}\n")
+    print("The projection matches the request snapshot: MATCH.")
+    print("The projection differs from current authority: STALE.")
+    print("Nothing failed. The copied snapshot became outdated while it waited.")
+    print("No freshness validation, rejection, versioning, or retry was used.")
+    return 0
+
+
 def _print_projection(
     projection: InventoryProjection, authoritative_state: InventoryState
 ) -> None:
@@ -471,6 +506,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers.add_parser(
         "multiple-workers", help="run the Chapter 9 two-worker scenario"
+    )
+    subparsers.add_parser(
+        "stale-snapshots", help="run the Chapter 10 stale-snapshot scenario"
     )
     inventory_parser = subparsers.add_parser(
         "inventory", help="display a Chapter 1 inventory state"
@@ -515,6 +553,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return worker_capacity()
     if args.command == "multiple-workers":
         return multiple_workers()
+    if args.command == "stale-snapshots":
+        return stale_snapshots()
     return authority(
         args.authority_on_hand,
         args.authority_reserved,

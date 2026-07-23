@@ -19,8 +19,9 @@ This repository is **education-first**: the written guide introduces each idea b
 - Chapter 7: Queues — **complete**
 - Chapter 8: Workers and Capacity — **complete**
 - Chapter 9: Multiple Workers — **complete**
+- Chapter 10: Stale Snapshots — **complete**
 
-Next: **Chapter 10 — Stale Snapshots**
+Next: measuring how old synchronized information has become.
 
 The laboratory now records inventory events and derives current inventory by
 replaying an immutable ledger. Projections can be compared with that authority
@@ -29,7 +30,9 @@ queue. Work now takes fixed simulated time: one worker can process only one
 request at once, queue depth and wait time can grow, and projections update at
 completion. A deterministic fixed two-worker pool now allows multiple requests
 to be in progress during the same simulated interval. FIFO requests and numbered
-workers make assignment deterministic, while service time remains fixed. Real
+workers make assignment deterministic, while service time remains fixed.
+Chapter 10 demonstrates that authority can change while an earlier captured
+snapshot waits, leaving a successful projection update already obsolete. Real
 threads, failures, retries, and random service times are not implemented; this is not
 production synchronization. Start with
 [Setting Up Your Laboratory](book/00-setting-up-your-laboratory.md), continue to
@@ -41,7 +44,8 @@ Then read [The Inventory Ledger](book/03-the-inventory-ledger.md) and
 [Direct Synchronization](book/06-direct-synchronization.md), followed by
 [Queues](book/07-queues.md), and then [Workers and
 Capacity](book/08-workers-and-capacity.md), followed by [Multiple
-Workers](book/09-multiple-workers.md).
+Workers](book/09-multiple-workers.md), and then [Stale
+Snapshots](book/10-stale-snapshots.md).
 
 ## Quick start
 
@@ -62,6 +66,7 @@ docker compose run --rm lab inventory-sim sync-direct
 docker compose run --rm lab inventory-sim sync-queue
 docker compose run --rm lab inventory-sim worker-capacity
 docker compose run --rm lab inventory-sim multiple-workers
+docker compose run --rm lab inventory-sim stale-snapshots
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \

@@ -84,6 +84,9 @@ jobs:
       - name: Run Chapter 9 multiple workers smoke check
         run: docker compose run --rm lab inventory-sim multiple-workers
 
+      - name: Run Chapter 10 stale snapshots smoke check
+        run: docker compose run --rm lab inventory-sim stale-snapshots
+
       - name: Verify coverage report
         run: test -s coverage.xml
 
