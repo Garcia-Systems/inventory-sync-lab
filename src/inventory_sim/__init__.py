@@ -41,6 +41,11 @@ from inventory_sim.queues import (
     run_queue_synchronization_scenario,
 )
 from inventory_sim.simulation import EventExecution, EventScheduler, VirtualClock
+from inventory_sim.stale_snapshots import (
+    StaleSnapshotInspection,
+    StaleSnapshotsResult,
+    run_stale_snapshots_scenario,
+)
 from inventory_sim.synchronization import (
     DirectSynchronizationExecution,
     DirectSynchronizationResult,
@@ -56,7 +61,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 __all__ = [
     "Adjustment",
@@ -88,6 +93,8 @@ __all__ = [
     "SynchronizationRequest",
     "SynchronizationWorker",
     "SynchronizationWorkItem",
+    "StaleSnapshotInspection",
+    "StaleSnapshotsResult",
     "VirtualClock",
     "WorkerExecution",
     "WorkerCapacityResult",
@@ -104,5 +111,6 @@ __all__ = [
     "run_queue_synchronization_scenario",
     "run_worker_capacity_scenario",
     "run_multiple_workers_scenario",
+    "run_stale_snapshots_scenario",
     "synchronize_directly",
 ]
