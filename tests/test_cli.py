@@ -638,3 +638,30 @@ def test_package_module_supports_fanout_command() -> None:
     )
     assert completed.returncode == 0
     assert "One inventory event became three independent work items" in completed.stdout
+
+
+def test_duplicate_delivery_command_reports_repeated_processing(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["duplicate-delivery"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Authority Revision 11",
+        "Synchronization Request 42",
+        "Delivery 1\nProjection updated to Revision 11",
+        "Delivery 2\nProjection updated to Revision 11",
+        "Business events: 1",
+        "Request deliveries: 2",
+        "Projection updates: 2",
+        "expected in many reliable messaging systems",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_duplicate_delivery_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "duplicate-delivery"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Request deliveries: 2" in completed.stdout

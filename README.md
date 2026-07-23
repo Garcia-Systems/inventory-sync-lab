@@ -61,6 +61,7 @@ Synchronizations](book/13-detecting-stale-synchronizations.md), and then
 Continue with [Multiple Projections](book/15-multiple-projections.md), followed by
 [Fan-Out Synchronization](book/16-fan-out-synchronization.md), and then [Retry
 Policies](book/17-retry-policies.md).
+Continue with [Duplicate Delivery](book/18-duplicate-delivery.md).
 
 ## Quick start
 
@@ -89,6 +90,7 @@ docker compose run --rm lab inventory-sim reject-stale
 docker compose run --rm lab inventory-sim multiple-projections
 docker compose run --rm lab inventory-sim fanout
 docker compose run --rm lab inventory-sim retries
+docker compose run --rm lab inventory-sim duplicate-delivery
 docker compose run --rm lab pytest
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
