@@ -61,6 +61,12 @@ from inventory_sim.stale_detection import (
     detect_stale_request,
     run_stale_detection_scenario,
 )
+from inventory_sim.stale_rejection import (
+    StaleRejectionResult,
+    SynchronizationRejectionInspection,
+    inspect_synchronization_policy,
+    run_stale_rejection_scenario,
+)
 from inventory_sim.stale_snapshots import (
     StaleSnapshotInspection,
     StaleSnapshotsResult,
@@ -81,7 +87,7 @@ from inventory_sim.worker_pool import (
     run_multiple_workers_scenario,
 )
 
-__version__ = "0.13.0"
+__version__ = "0.14.0"
 
 __all__ = [
     "Adjustment",
@@ -122,6 +128,8 @@ __all__ = [
     "StaleSnapshotsResult",
     "StaleDetection",
     "StaleDetectionResult",
+    "StaleRejectionResult",
+    "SynchronizationRejectionInspection",
     "VirtualClock",
     "WorkerExecution",
     "WorkerCapacityResult",
@@ -136,6 +144,7 @@ __all__ = [
     "__version__",
     "compare_inventory",
     "detect_stale_request",
+    "inspect_synchronization_policy",
     "measure_freshness",
     "observe_ledger_revisions",
     "run_direct_synchronization_scenario",
@@ -144,6 +153,7 @@ __all__ = [
     "run_multiple_workers_scenario",
     "run_stale_snapshots_scenario",
     "run_stale_detection_scenario",
+    "run_stale_rejection_scenario",
     "run_freshness_scenario",
     "run_inventory_revisions_scenario",
     "synchronize_directly",

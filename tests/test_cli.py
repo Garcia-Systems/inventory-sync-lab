@@ -178,6 +178,38 @@ def test_package_module_supports_detect_stale_command() -> None:
     assert "Detection was an observation only" in completed.stdout
 
 
+def test_reject_stale_command_reports_policy_outcomes(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["reject-stale"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Rejecting Stale Synchronizations",
+        "Worker: worker-1",
+        "Request revision: 2",
+        "Result: REJECTED",
+        "Projection unchanged.",
+        "Worker: worker-2",
+        "Request revision: 4",
+        "Result: ACCEPTED",
+        "Projection updated.",
+        "Accepted requests: 1",
+        "Rejected requests: 1",
+        "Final authoritative revision: 4",
+        "Final projection revision: 4",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_reject_stale_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "reject-stale"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Both workers complete normally" in completed.stdout
+
+
 def test_worker_capacity_command_reports_canonical_lesson(capsys) -> None:  # type: ignore[no-untyped-def]
     assert main(["worker-capacity"]) == 0
     output = capsys.readouterr().out

@@ -120,10 +120,17 @@ class WorkerPool:
         return tuple(starts)
 
     def complete(
-        self, *, worker_name: str, projections: ProjectionRegistry, current_time: int
+        self,
+        *,
+        worker_name: str,
+        projections: ProjectionRegistry,
+        current_time: int,
+        update_projection: bool = True,
     ) -> WorkerCompletion:
         return self.get(worker_name).complete(
-            projections=projections, current_time=current_time
+            projections=projections,
+            current_time=current_time,
+            update_projection=update_projection,
         )
 
 
