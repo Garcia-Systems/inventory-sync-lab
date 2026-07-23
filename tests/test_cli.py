@@ -694,3 +694,35 @@ def test_package_module_supports_idempotency_command() -> None:
     )
     assert completed.returncode == 0
     assert completed.stdout.count("Already applied.") == 2
+
+
+def test_out_of_order_command_explains_ordering_failure(capsys) -> None:  # type: ignore[no-untyped-def]
+    assert main(["out-of-order"]) == 0
+    output = capsys.readouterr().out
+    for wording in (
+        "Revision 13 created",
+        "Revision 14 created",
+        "Delivery order\n\nRevision 14\n\nRevision 13",
+        "Revision 14 applied",
+        "Projection revision: 14",
+        "Revision 13 applied",
+        "Projection revision: 13",
+        "Final authority revision: 14",
+        "Final projection revision: 13",
+        "Projection is behind authority.",
+        "No retries occurred. No duplicate deliveries occurred.",
+        "Every request succeeded and was processed exactly once.",
+        "Ordering alone caused the incorrect result.",
+    ):
+        assert wording in output
+
+
+def test_package_module_supports_out_of_order_command() -> None:
+    completed = subprocess.run(
+        [sys.executable, "-m", "inventory_sim", "out-of-order"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+    assert "Final projection revision: 13" in completed.stdout
