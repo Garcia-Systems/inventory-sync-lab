@@ -66,6 +66,21 @@ python -m pip install --editable '.[dev]'
 inventory-sim doctor
 ```
 
+Release artifacts provide the same `inventory-sim` command. To validate or use
+a downloaded wheel from a release, install it in a fresh environment (replace
+the filename if necessary):
+
+```bash
+python3.13 -m venv .venv
+. .venv/bin/activate
+python -m pip install inventory_sync_lab-1.0.0-py3-none-any.whl
+inventory-sim doctor
+inventory-sim inventory --on-hand 10 --reserved 3
+```
+
+The version reported by `doctor` and the distribution metadata both come from
+`inventory_sim.__version__`; for the Volume I release they report `1.0.0`.
+
 Docker remains the documented common environment for contributors and CI.
 
 ## Run the textbook

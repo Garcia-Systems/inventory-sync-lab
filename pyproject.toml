@@ -4,25 +4,59 @@ build-backend = "hatchling.build"
 
 [project]
 name = "inventory-sync-lab"
-version = "0.16.0"
+dynamic = ["version"]
 description = "An executable engineering textbook for learning deterministic inventory synchronization."
 readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
+authors = [{ name = "Garcia Systems" }]
+keywords = ["distributed-systems", "education", "inventory", "simulation"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Education",
+]
 dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/Garcia-Systems/inventory-sync-lab#readme"
+Issues = "https://github.com/Garcia-Systems/inventory-sync-lab/issues"
+Source = "https://github.com/Garcia-Systems/inventory-sync-lab"
 
 [project.optional-dependencies]
 dev = [
+    "build>=1.2,<2",
     "pytest>=8.3,<9",
     "pytest-cov>=6,<7",
     "ruff>=0.11,<0.12",
+    "twine>=6,<7",
 ]
 
 [project.scripts]
 inventory-sim = "inventory_sim.cli:main"
 
+[tool.hatch.version]
+path = "src/inventory_sim/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/inventory_sim"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/CONTRIBUTING.md",
+    "/LICENSE",
+    "/README.md",
+    "/book",
+    "/diagrams",
+    "/docs",
+    "/pyproject.toml",
+    "/src",
+    "/tests",
+]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
