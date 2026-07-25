@@ -1,12 +1,10 @@
 # Inventory State
 
 ```mermaid
-flowchart TD
-    OH["On hand: 10<br/>physical units"]
-    R["Reserved: 3<br/>committed units"]
-    A["Available: 7<br/>sellable units"]
-    OH --> R
-    OH --> A
+flowchart LR
+    R["Reserved: 3"] --> S["3 + 7 = 10"]
+    A["Available: 7"] --> S
+    S --> OH["On hand: 10"]
 ```
 
-The two children account for all ten on-hand units: `3 + 7 = 10`.
+Reserved and available units account for all ten on-hand units: `3 + 7 = 10`.
