@@ -53,6 +53,8 @@ Markdown links. Avoid copying the same chapter list into multiple pages: the
 Diagrams should express only what their chapter claims. Use a consistent
 top-to-bottom or left-to-right flow, label policy branches, and include a short
 paragraph stating what the diagram does *not* imply when ambiguity is possible.
+Follow the [diagram style guide](docs/diagram-style-guide.md), and run the
+Mermaid validator whenever a Mermaid diagram changes.
 
 ## Development checks
 
@@ -62,6 +64,7 @@ Use the documented Docker environment rather than relying on host Python tools:
 docker compose build
 docker compose run --rm lab ruff check .
 docker compose run --rm lab ruff format --check .
+python scripts/validate-mermaid.py
 docker compose run --rm lab pytest \
   --cov=inventory_sim \
   --cov-branch \

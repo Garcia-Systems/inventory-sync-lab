@@ -17,6 +17,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js for Mermaid validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate Mermaid diagrams
+        run: |
+          python scripts/validate-mermaid.py --output /tmp/mermaid-diagrams
+          for diagram in /tmp/mermaid-diagrams/*.mmd; do
+            npx --yes @mermaid-js/mermaid-cli@11.4.2 \
+              --input "$diagram" \
+              --output "${diagram%.mmd}.svg"
+          done
+
       - name: Display Docker versions
         run: |
           docker --version

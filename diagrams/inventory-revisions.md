@@ -2,10 +2,10 @@
 
 ```mermaid
 flowchart TD
-    A[Ledger] --> B[Revision 1<br/>Available 10]
-    B --> C[Revision 2<br/>Available 7]
-    C --> D[Revision 3<br/>Available 10]
-    D --> E[Quantity repeats<br/>Revision increases]
+    A[Ledger] --> B["Revision 1 — available 10"]
+    B --> C["Revision 2 — available 7"]
+    C --> D["Revision 3 — available 10"]
+    D --> E["Quantity repeats — revision increases"]
 ```
 
 The downward path is ledger chronology. Available quantity returns to 10, while
