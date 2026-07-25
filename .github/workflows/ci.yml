@@ -23,13 +23,7 @@ jobs:
           node-version: "20"
 
       - name: Validate Mermaid diagrams
-        run: |
-          python scripts/validate-mermaid.py --output /tmp/mermaid-diagrams
-          for diagram in /tmp/mermaid-diagrams/*.mmd; do
-            npx --yes @mermaid-js/mermaid-cli@11.4.2 \
-              --input "$diagram" \
-              --output "${diagram%.mmd}.svg"
-          done
+        run: python scripts/validate-mermaid.py --render
 
       - name: Display Docker versions
         run: |

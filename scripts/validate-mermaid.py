@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
+import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -20,6 +22,9 @@ EXCLUDED_DIRECTORIES = {
     ".venv",
     "node_modules",
 }
+MERMAID_CLI_VERSION = "11.4.2"
+REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+PUPPETEER_CONFIG = REPOSITORY_ROOT / "puppeteer-config.json"
 
 
 @dataclass(frozen=True)
@@ -77,11 +82,51 @@ def discover(root: Path) -> tuple[list[Diagram], list[str]]:
     return diagrams, errors
 
 
+def export(diagrams: list[Diagram], output: Path) -> list[Path]:
+    shutil.rmtree(output, ignore_errors=True)
+    output.mkdir(parents=True)
+    exported: list[Path] = []
+    for number, diagram in enumerate(diagrams, start=1):
+        safe_name = re.sub(r"[^A-Za-z0-9_.-]", "-", str(diagram.path))
+        destination = output / f"{number:03d}-{safe_name}.mmd"
+        destination.write_text(diagram.source, encoding="utf-8")
+        exported.append(destination)
+    return exported
+
+
+def render(diagrams: list[Path]) -> None:
+    if not PUPPETEER_CONFIG.is_file():
+        raise FileNotFoundError(
+            f"Puppeteer configuration not found: {PUPPETEER_CONFIG}"
+        )
+    for diagram in diagrams:
+        subprocess.run(
+            [
+                "npx",
+                "--yes",
+                f"@mermaid-js/mermaid-cli@{MERMAID_CLI_VERSION}",
+                "-p",
+                str(PUPPETEER_CONFIG),
+                "-i",
+                str(diagram),
+                "-o",
+                str(diagram.with_suffix(".svg")),
+            ],
+            cwd=REPOSITORY_ROOT,
+            check=True,
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--root", type=Path, default=REPOSITORY_ROOT)
     parser.add_argument(
         "--output", type=Path, help="directory for extracted .mmd files"
+    )
+    parser.add_argument(
+        "--render",
+        action="store_true",
+        help="render extracted diagrams with Mermaid CLI",
     )
     args = parser.parse_args()
     root = args.root.resolve()
@@ -98,19 +143,22 @@ def main() -> int:
     if not diagrams:
         errors.append("no Mermaid diagrams found")
 
-    if args.output:
-        shutil.rmtree(args.output, ignore_errors=True)
-        args.output.mkdir(parents=True)
-        for number, diagram in enumerate(diagrams, start=1):
-            safe_name = re.sub(r"[^A-Za-z0-9_.-]", "-", str(diagram.path))
-            (args.output / f"{number:03d}-{safe_name}.mmd").write_text(
-                diagram.source, encoding="utf-8"
-            )
-
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
+
+    if args.output:
+        extracted = export(diagrams, args.output.resolve())
+        if args.render:
+            render(extracted)
+    elif args.render:
+        with tempfile.TemporaryDirectory(prefix="mermaid-diagrams-") as temporary:
+            extracted = export(diagrams, Path(temporary))
+            render(extracted)
+
     print(f"Validated {len(diagrams)} Mermaid diagram(s).")
+    if args.render:
+        print(f"Rendered {len(diagrams)} Mermaid diagram(s).")
     return 0
 
 

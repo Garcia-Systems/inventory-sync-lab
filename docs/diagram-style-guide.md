@@ -27,11 +27,14 @@ Run the repository scanner before committing:
 
 ```bash
 python scripts/validate-mermaid.py
+python scripts/validate-mermaid.py --render
 ```
 
 The scanner discovers Mermaid fences in Markdown and standalone `.mmd` files,
 rejects HTML tags, and exports every diagram for syntax rendering. CI renders
-those exported sources with Mermaid CLI, so malformed syntax fails the build.
+those exported sources with the pinned Mermaid CLI version, so malformed syntax
+fails the build. The rendering command requires Node.js and `npx`; it uses the
+repository's dedicated Puppeteer configuration to match CI.
 
 Automated validation is necessary but not sufficient. Preview every changed
 diagram in GitHub before merging, checking label wrapping, arrow crossings, and
